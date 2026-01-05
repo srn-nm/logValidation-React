@@ -10,6 +10,7 @@ export default function Layout() {
     <Box className="flex justify-end min-h-screen min-w-screen bg-gray-100 dark:bg-gray-900 transition-colors stretch">
       
       <Box className="flex flex-col flex-1 min-h-screen h-full stretch">
+        <img></img>
         <NavBar />
         <motion.main
           className="flex-1 h-full stretch"
@@ -23,11 +24,6 @@ export default function Layout() {
           </Box>
 
         </motion.main>
-        
-        {/* 
-        <footer className=" flex items-center justify-center px-6 py-4 shadow-lg transition-colors dark:bg-gray-800 dark:text-white bg-white text-gray-900 text-xs">
-          footer
-        </footer> */}
       </Box>
       
     </Box>
