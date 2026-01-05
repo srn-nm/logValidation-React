@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import NavBar from "./NavBar";
 import Box from "@mui/material/Box";
-import { motion } from "framer-motion";
+import {motion} from "framer-motion"
 
 export default function Layout() {
 
