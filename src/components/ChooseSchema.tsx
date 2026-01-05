@@ -6,6 +6,7 @@ import axios from "axios"
 export default function ChooseSchema() {
     const [schema, setSchema] = useState("");
     const [isChecking, setIsChecking] = useState(false);
+    const [data, setData] = useState<any>([]);
 
     const handleCheckSchema = async () => {
         setIsChecking(true);
@@ -14,7 +15,8 @@ export default function ChooseSchema() {
             const res = await axios.get("http://172.16.20.134/api/v1/data/validation/schema/${schema}", {
                 params: { calc_validation: false, deep_check: false, max_depth: 1, lang: "en"},
             });
-            const data = Array.isArray(res.data) ? res.data : []; 
+            const result = Array.isArray(res.data) ? res.data : []; 
+            setData(result)
             console.log(data);               
         } catch (error) {
             console.error("Error checking schema:", error);
@@ -25,7 +27,17 @@ export default function ChooseSchema() {
 
     return (
         <div>
+
             <div className="w-full max-w-md px-4 bg-gray-900 p-5 rounded-lg shadow-lg border border-gray-700 flex-col ">
+                {isChecking && 
+                    <div className="flex h-full w-full items-center justify-center bg-gray-100 dark:bg-gray-900">
+                        <div className="w-16 h-16 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin m-10">
+                        </div>
+                    </div>
+                }
+
+                {!isChecking &&
+                <>
                 <Field>
                     <Label className="text-md font-medium text-white">Enter Schema:</Label>
                     <Input
@@ -52,8 +64,15 @@ export default function ChooseSchema() {
                 >
                     Check
                 </button>
-                
+
+                </>
+                }
             </div>
+
+            <div>
+                {data}
+            </div>
+
         </div>
     );
 }
