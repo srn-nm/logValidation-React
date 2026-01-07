@@ -1,4 +1,4 @@
-import type DataValidationResponse from "../types/DataValidationResponse"
+import type DataValidationResponse from "../types/dataValidationResponse"
 
 interface Props {
   validationData: DataValidationResponse;

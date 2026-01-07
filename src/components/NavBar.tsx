@@ -6,9 +6,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 const navigation = [
   { name: 'Dashboard', href: '/Dashboard', current: false },
-  { name: 'Data Validation', href: '/DataValidation', current: false },
   { name: 'Schema Validation', href: '/SchemaValidation', current: false },
-
 ]
 
 function classNames(...classes: any) {

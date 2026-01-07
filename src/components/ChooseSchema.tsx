@@ -6,9 +6,10 @@ import HARDCODED_SCHEMA_LIST from "../constants/SchemasList";
 import axios from "axios";
 import ModalHeaderSchema from "./ModalHeaderSchema";
 import ModalContentSchema from "./ModalContentSchema";
-import type SchemaValidationResponse from "../types/SchemaValidationResponse";
-import type DataValidationResponse from "../types/DataValidationResponse";
+import type SchemaValidationResponse from "../types/schemaValidationResponse";
+import type DataValidationResponse from "../types/dataValidationResponse";
 import ModalHeaderData from "./ModalHeaderData";
+import ModalContentData from "./ModalContentData";
 
 export default function ChooseSchema() {
   const [selectedSchema, setSelectedSchema] = useState(HARDCODED_SCHEMA_LIST[0]);
@@ -245,7 +246,7 @@ export default function ChooseSchema() {
             {validationType == "schema" && (
             <>
               <ModalHeaderData validationResponse={dataValidationResponse} validationType={validationType} closeModal={closeModal} selectedSchema={selectedSchema}/>
-              {/* <ModalContentData validationResponse={dataValidationResponse} validationType={validationType} getStatusColor={getStatusColor} />  */}
+              <ModalContentData validationResponse={dataValidationResponse} validationType={validationType} getStatusColor={getStatusColor} /> 
             </>
             )}
           </div>

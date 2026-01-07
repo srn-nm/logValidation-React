@@ -1,5 +1,5 @@
 import { XMarkIcon } from "@heroicons/react/20/solid";
-import type SchemaValidationResponse from "../types/SchemaValidationResponse"
+import type SchemaValidationResponse from "../types/schemaValidationResponse"
 
 interface Props {
   validationResponse: SchemaValidationResponse ;
@@ -46,7 +46,6 @@ export default function ModalHeaderSchema ({validationResponse, validationType, 
                 </div>
               </div>
               
-              {/* Close Button */}
               <button
                 onClick={closeModal}
                 className="p-2 rounded-lg hover:bg-gray-700 transition-colors duration-150"

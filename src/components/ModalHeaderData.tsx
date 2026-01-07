@@ -1,5 +1,5 @@
 import { XMarkIcon } from "@heroicons/react/20/solid";
-import type DataValidationResponse from "../types/DataValidationResponse";
+import type DataValidationResponse from "../types/dataValidationResponse";
 import HARDCODED_SCHEMA_LIST from "../constants/SchemasList"; 
 
 interface Props {

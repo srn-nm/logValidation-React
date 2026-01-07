@@ -1,4 +1,4 @@
-import type SchemaValidationResponse from "../types/SchemaValidationResponse"
+import type SchemaValidationResponse from "../types/schemaValidationResponse"
 
 interface Props {
   validationData: SchemaValidationResponse ;
