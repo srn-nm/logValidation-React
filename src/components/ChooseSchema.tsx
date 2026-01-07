@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headlessui/react";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
-import HARDCODED_SCHEMA_LIST from "../constants/schemasList"; 
+import HARDCODED_SCHEMA_LIST from "../constants/SchemasList"; 
 import axios from "axios";
 
 export default function ChooseSchema() {
@@ -64,75 +64,30 @@ export default function ChooseSchema() {
     const schemaId = selectedSchema.id.toString();
     
     // Check if the API response has data for this schema ID
-    if (apiData[schemaId]) {
-      // The data is nested under the schema ID key
-      const schemaData = apiData[schemaId];
+    if (apiData[schemaId] && apiData[schemaId].root) {
+      // The API returns: { "27": { "root": [...] } }
+      const rootArray = apiData[schemaId].root;
       
-      // Check if it has a 'non_calc' property (from your console log)
-      if (schemaData.non_calc) {
-        // Convert non_calc array to the expected 'root' format
-        return {
-          id: selectedSchema.id,
-          description: selectedSchema.description,
-          root: schemaData.non_calc.map((item: any, index: number) => ({
-            _id: index,
-            field: item.field || `Field ${index}`,
-            type: item.type || "schema",
-            code: item.code || "UNKNOWN",
-            level: item.level || "WARNING",
-            detail: {
-              en: item.message || item.detail?.en || "No details available",
-              fa: item.detail?.fa || ""
-            }
-          }))
-        };
-      } else if (schemaData.root) {
-        // Has root property directly
-        return {
-          id: selectedSchema.id,
-          description: selectedSchema.description,
-          root: schemaData.root
-        };
-      } else {
-        // Unknown structure, return as is
-        return {
-          id: selectedSchema.id,
-          description: selectedSchema.description,
-          ...schemaData,
-          root: [] // Ensure root exists
-        };
-      }
+      console.log("Found root array with", rootArray.length, "items");
+      
+      return {
+        id: selectedSchema.id,
+        description: selectedSchema.description,
+        root: rootArray, // Use the root array directly
+        schemaId: schemaId
+      };
+      
+    } else if (apiData[schemaId]) {
+      // Has schema ID key but no root property
+      return {
+        id: selectedSchema.id,
+        description: selectedSchema.description,
+        root: [],
+        note: "No validation issues found for this schema"
+      };
+      
     } else {
-      // API response doesn't have data for this schema ID
-      // Try to extract any available data
-      const keys = Object.keys(apiData).filter(key => !isNaN(Number(key)));
-      
-      if (keys.length > 0) {
-        // Use the first available data
-        const firstKey = keys[0];
-        const firstData = apiData[firstKey];
-        
-        if (firstData.non_calc) {
-          return {
-            id: selectedSchema.id,
-            description: selectedSchema.description,
-            root: firstData.non_calc.map((item: any, index: number) => ({
-              _id: index,
-              field: item.field || `Field ${index}`,
-              type: item.type || "schema",
-              code: item.code || "UNKNOWN",
-              level: item.level || "WARNING",
-              detail: {
-                en: item.message || item.detail?.en || "No details available",
-                fa: item.detail?.fa || ""
-              }
-            })),
-            note: `Showing validation data for schema ${firstKey} (requested: ${selectedSchema.id})`
-          };
-        }
-      }
-      
-      // No data found
+      // No data found for this schema ID
       return {
         id: selectedSchema.id,
         description: selectedSchema.description,
@@ -202,7 +157,7 @@ export default function ChooseSchema() {
                   </ListboxButton>
                   
                   <ListboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-gray-800 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                    {HARDCODED_SCHEMA_LIST.map((schema) => (
+                    {HARDCODED_SCHEMA_LIST.map((schema: any) => (
                       <ListboxOption
                         key={schema.id}
                         className={({ active }) =>
@@ -367,29 +322,29 @@ export default function ChooseSchema() {
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-gray-700">
-                            {validationData.map((error: any, index: number) => (
+                            {validationData.root.map((error: any, index: number) => (
                               <tr key={index} className="hover:bg-gray-700/50 transition-colors">
                                 <td className="px-4 py-3 text-gray-400 font-mono">
                                   {index + 1}
                                 </td>
                                 <td className="px-4 py-3 text-blue-400 font-mono">
-                                  {error.field || `Error ${index + 1}`}
+                                  {error.field}
                                 </td>
                                 <td className="px-4 py-3 text-gray-300">
-                                  {error.type || "schema"}
+                                  {error.type}
                                 </td>
                                 <td className="px-4 py-3 font-mono">
                                   <span className="px-2 py-1 text-xs bg-purple-500/20 text-purple-300 rounded-full">
-                                    {error.code || "UNKNOWN"}
+                                    {error.code}
                                   </span>
                                 </td>
                                 <td className="px-4 py-3">
                                   <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(error.level)}`}>
-                                    {error.level || "WARNING"}
+                                    {error.level}
                                   </span>
                                 </td>
                                 <td className="px-4 py-3 text-gray-300">
-                                  {error.detail?.en || error.detail || error.message || "No details available"}
+                                  {error.detail?.en || error.detail}
                                 </td>
                               </tr>
                             ))}
@@ -432,259 +387,3 @@ export default function ChooseSchema() {
     </div>
   );
 }
-
-// the result format given from server to me: {
-//     "27": {
-//         "root": [
-//             {
-//                 "_id": null,
-//                 "field": "TEL.group",
-//                 "type": "schema",
-//                 "code": "MISSING",
-//                 "level": "WARNING",
-//                 "detail": {
-//                     "en": "'TEL.group' is missing",
-//                     "fa": ""
-//                 }
-//             },
-//             {
-//                 "_id": null,
-//                 "field": "NAME.group",
-//                 "type": "schema",
-//                 "code": "MISSING",
-//                 "level": "WARNING",
-//                 "detail": {
-//                     "en": "'NAME.group' is missing",
-//                     "fa": ""
-//                 }
-//             },
-//             {
-//                 "_id": null,
-//                 "field": "ID_PIC.group",
-//                 "type": "schema",
-//                 "code": "MISSING",
-//                 "level": "WARNING",
-//                 "detail": {
-//                     "en": "'ID_PIC.group' is missing",
-//                     "fa": ""
-//                 }
-//             },
-//             {
-//                 "_id": null,
-//                 "field": "NATIONALCODE.group",
-//                 "type": "schema",
-//                 "code": "MISSING",
-//                 "level": "WARNING",
-//                 "detail": {
-//                     "en": "'NATIONALCODE.group' is missing",
-//                     "fa": ""
-//                 }
-//             }
-//         ]
-//     }
-// }
-
-
-// console: 
-// API Response data: {27: {…}}27: root: Array(4)0: code: "MISSING"detail: {en: "'TEL.group' is missing", fa: ''}field: "TEL.group"level: "WARNING"type: "schema"_id: null[[Prototype]]: Object1: {_id: null, field: 'NAME.group', type: 'schema', code: 'MISSING', level: 'WARNING', …}2: {_id: null, field: 'ID_PIC.group', type: 'schema', code: 'MISSING', level: 'WARNING', …}3: {_id: null, field: 'NATIONALCODE.group', type: 'schema', code: 'MISSING', level: 'WARNING', …}length: 4[[Prototype]]: Array(0)[[Prototype]]: Objectconstructor: ƒ Object()hasOwnProperty: ƒ hasOwnProperty()isPrototypeOf: ƒ isPrototypeOf()propertyIsEnumerable: ƒ propertyIsEnumerable()toLocaleString: ƒ toLocaleString()toString: ƒ toString()valueOf: ƒ valueOf()__defineGetter__: ƒ __defineGetter__()__defineSetter__: ƒ __defineSetter__()__lookupGetter__: ƒ __lookupGetter__()__lookupSetter__: ƒ __lookupSetter__()__proto__: (...)get __proto__: ƒ __proto__()set __proto__: ƒ __proto__()[[Prototype]]: Objectconstructor: ƒ Object()hasOwnProperty: ƒ hasOwnProperty()isPrototypeOf: ƒ isPrototypeOf()propertyIsEnumerable: ƒ propertyIsEnumerable()toLocaleString: ƒ toLocaleString()toString: ƒ toString()valueOf: ƒ valueOf()__defineGetter__: ƒ __defineGetter__()__defineSetter__: ƒ __defineSetter__()__lookupGetter__: ƒ __lookupGetter__()__lookupSetter__: ƒ __lookupSetter__()__proto__: (...)get __proto__: ƒ __proto__()set __proto__: ƒ __proto__()
-// ChooseSchema.tsx:62 Processing API data: {27: {…}}
-// SchemaValidation.tsx:7  TypeError: validationData.map is not a function
-//     at ChooseSchema (ChooseSchema.tsx:370:45)
-//     at Object.react_stack_bottom_frame (react-dom-client.development.js:25904:20)
-//     at renderWithHooks (react-dom-client.development.js:7662:22)
-//     at updateFunctionComponent (react-dom-client.development.js:10166:19)
-//     at beginWork (react-dom-client.development.js:11778:18)
-//     at runWithFiberInDEV (react-dom-client.development.js:871:30)
-//     at performUnitOfWork (react-dom-client.development.js:17641:22)
-//     at workLoopSync (react-dom-client.development.js:17469:41)
-//     at renderRootSync (react-dom-client.development.js:17450:11)
-//     at performWorkOnRoot (react-dom-client.development.js:16583:35)
-
-// The above error occurred in the <ChooseSchema> component.
-
-// React will try to recreate this component tree from scratch using the error boundary you provided, RenderErrorBoundary.
-
-// overrideMethod @ hook.js:608
-// defaultOnCaughtError @ react-dom-client.development.js:9410
-// logCaughtError @ react-dom-client.development.js:9446
-// runWithFiberInDEV @ react-dom-client.development.js:871
-// inst.componentDidCatch.update.callback @ react-dom-client.development.js:9493
-// callCallback @ react-dom-client.development.js:7423
-// commitCallbacks @ react-dom-client.development.js:7443
-// runWithFiberInDEV @ react-dom-client.development.js:871
-// commitClassCallbacks @ react-dom-client.development.js:13377
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:14026
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:13949
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:14165
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:14165
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:13949
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:14165
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:14165
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:14165
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:14165
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:13949
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:13949
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:14165
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:13949
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:14165
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:14031
-// flushLayoutEffects @ react-dom-client.development.js:18138
-// commitRoot @ react-dom-client.development.js:17954
-// commitRootWhenReady @ react-dom-client.development.js:16824
-// performWorkOnRoot @ react-dom-client.development.js:16722
-// performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:18957
-// performWorkUntilDeadline @ scheduler.development.js:45
-// <ChooseSchema>
-// exports.jsxDEV @ react-jsx-dev-runtime.development.js:335
-// SchemaValidation @ SchemaValidation.tsx:7
-// react_stack_bottom_frame @ react-dom-client.development.js:25904
-// renderWithHooksAgain @ react-dom-client.development.js:7762
-// renderWithHooks @ react-dom-client.development.js:7674
-// updateFunctionComponent @ react-dom-client.development.js:10166
-// beginWork @ react-dom-client.development.js:11778
-// runWithFiberInDEV @ react-dom-client.development.js:871
-// performUnitOfWork @ react-dom-client.development.js:17641
-// workLoopSync @ react-dom-client.development.js:17469
-// renderRootSync @ react-dom-client.development.js:17450
-// performWorkOnRoot @ react-dom-client.development.js:16504
-// performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:18957
-// performWorkUntilDeadline @ scheduler.development.js:45
-// <SchemaValidation>
-// exports.jsxDEV @ react-jsx-dev-runtime.development.js:335
-// (anonymous) @ Router.tsx:37
-// App.tsx:28  React Router caught the following error during render TypeError: validationData.map is not a function
-//     at ChooseSchema (ChooseSchema.tsx:370:45)
-//     at Object.react_stack_bottom_frame (react-dom-client.development.js:25904:20)
-//     at renderWithHooks (react-dom-client.development.js:7662:22)
-//     at updateFunctionComponent (react-dom-client.development.js:10166:19)
-//     at beginWork (react-dom-client.development.js:11778:18)
-//     at runWithFiberInDEV (react-dom-client.development.js:871:30)
-//     at performUnitOfWork (react-dom-client.development.js:17641:22)
-//     at workLoopSync (react-dom-client.development.js:17469:41)
-//     at renderRootSync (react-dom-client.development.js:17450:11)
-//     at performWorkOnRoot (react-dom-client.development.js:16583:35)
-// overrideMethod @ hook.js:608
-// componentDidCatch @ chunk-JMJ3UQ3L.mjs:5774
-// react_stack_bottom_frame @ react-dom-client.development.js:25959
-// inst.componentDidCatch.update.callback @ react-dom-client.development.js:9504
-// callCallback @ react-dom-client.development.js:7423
-// commitCallbacks @ react-dom-client.development.js:7443
-// runWithFiberInDEV @ react-dom-client.development.js:871
-// commitClassCallbacks @ react-dom-client.development.js:13377
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:14026
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:13949
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:14165
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:14165
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:13949
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:14165
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:14165
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:14165
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:14165
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:13949
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:13949
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:14165
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:13949
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:14165
-// recursivelyTraverseLayoutEffects @ react-dom-client.development.js:15159
-// commitLayoutEffectOnFiber @ react-dom-client.development.js:14031
-// flushLayoutEffects @ react-dom-client.development.js:18138
-// commitRoot @ react-dom-client.development.js:17954
-// commitRootWhenReady @ react-dom-client.development.js:16824
-// performWorkOnRoot @ react-dom-client.development.js:16722
-// performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:18957
-// performWorkUntilDeadline @ scheduler.development.js:45
-// <RenderErrorBoundary>
-// exports.createElement @ react.development.js:1054
-// (anonymous) @ chunk-JMJ3UQ3L.mjs:5955
-// _renderMatches @ chunk-JMJ3UQ3L.mjs:5904
-// useRoutesImpl @ chunk-JMJ3UQ3L.mjs:5674
-// DataRoutes @ chunk-JMJ3UQ3L.mjs:6490
-// react_stack_bottom_frame @ react-dom-client.development.js:25904
-// renderWithHooksAgain @ react-dom-client.development.js:7762
-// renderWithHooks @ react-dom-client.development.js:7674
-// updateFunctionComponent @ react-dom-client.development.js:10166
-// updateSimpleMemoComponent @ react-dom-client.development.js:9830
-// updateMemoComponent @ react-dom-client.development.js:9763
-// beginWork @ react-dom-client.development.js:12204
-// runWithFiberInDEV @ react-dom-client.development.js:871
-// performUnitOfWork @ react-dom-client.development.js:17641
-// workLoopSync @ react-dom-client.development.js:17469
-// renderRootSync @ react-dom-client.development.js:17450
-// performWorkOnRoot @ react-dom-client.development.js:16504
-// performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:18957
-// performWorkUntilDeadline @ scheduler.development.js:45
-// <DataRoutes>
-// exports.createElement @ react.development.js:1054
-// RouterProvider @ chunk-JMJ3UQ3L.mjs:6458
-// react_stack_bottom_frame @ react-dom-client.development.js:25904
-// renderWithHooksAgain @ react-dom-client.development.js:7762
-// renderWithHooks @ react-dom-client.development.js:7674
-// updateFunctionComponent @ react-dom-client.development.js:10166
-// beginWork @ react-dom-client.development.js:11778
-// runWithFiberInDEV @ react-dom-client.development.js:871
-// performUnitOfWork @ react-dom-client.development.js:17641
-// workLoopSync @ react-dom-client.development.js:17469
-// renderRootSync @ react-dom-client.development.js:17450
-// performWorkOnRoot @ react-dom-client.development.js:16504
-// performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:18957
-// performWorkUntilDeadline @ scheduler.development.js:45
-// <RouterProvider>
-// exports.createElement @ react.development.js:1054
-// RouterProvider2 @ dom-export.mjs:51
-// react_stack_bottom_frame @ react-dom-client.development.js:25904
-// renderWithHooksAgain @ react-dom-client.development.js:7762
-// renderWithHooks @ react-dom-client.development.js:7674
-// updateFunctionComponent @ react-dom-client.development.js:10166
-// beginWork @ react-dom-client.development.js:11778
-// runWithFiberInDEV @ react-dom-client.development.js:871
-// performUnitOfWork @ react-dom-client.development.js:17641
-// workLoopSync @ react-dom-client.development.js:17469
-// renderRootSync @ react-dom-client.development.js:17450
-// performWorkOnRoot @ react-dom-client.development.js:16504
-// performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:18957
-// performWorkUntilDeadline @ scheduler.development.js:45
-// <RouterProvider2>
-// exports.jsxDEV @ react-jsx-dev-runtime.development.js:335
-// App @ App.tsx:28
-// react_stack_bottom_frame @ react-dom-client.development.js:25904
-// renderWithHooksAgain @ react-dom-client.development.js:7762
-// renderWithHooks @ react-dom-client.development.js:7674
-// updateFunctionComponent @ react-dom-client.development.js:10166
-// beginWork @ react-dom-client.development.js:11778
-// runWithFiberInDEV @ react-dom-client.development.js:871
-// performUnitOfWork @ react-dom-client.development.js:17641
-// workLoopSync @ react-dom-client.development.js:17469
-// renderRootSync @ react-dom-client.development.js:17450
-// performWorkOnRoot @ react-dom-client.development.js:16504
-// performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:18957
-// performWorkUntilDeadline @ scheduler.development.js:45
-// <App>
-// exports.jsxDEV @ react-jsx-dev-runtime.development.js:335
-// (anonymous) @ main.tsx:8
