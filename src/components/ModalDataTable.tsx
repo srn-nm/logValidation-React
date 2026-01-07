@@ -11,7 +11,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import type DataValidationResponse from '../types/DataValidationResponse';
+import type DataValidationResponse from '../types/dataValidationResponse';
 
 interface DataValidationError {
   _id: any;
@@ -115,7 +115,7 @@ interface Props {
 
 export default function ModalDataTable({ DataValidationResponse, validationType, getStatusColor }: Props) {
   const schemaId = Object.keys(DataValidationResponse)[0];
-  const dataObject = DataValidationResponse[schemaId];
+  const dataObject = DataValidationResponse[schemaId].root;
   
   const dataItems: DataItem[] = Object.keys(dataObject).map(dataId => ({
     dataId,
