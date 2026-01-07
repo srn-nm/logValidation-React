@@ -115,17 +115,14 @@ interface Props {
 
 export default function ModalDataTable({ DataValidationResponse, validationType, getStatusColor }: Props) {
   const schemaId = Object.keys(DataValidationResponse)[0];
-  
-  const dataObject = DataValidationResponse[schemaId];
+  const dataObject = DataValidationResponse[schemaId].root;
   
   const dataItems: DataItem[] = Object.keys(dataObject).map(dataId => ({
     dataId,
-    non_calc: dataObject[dataId]?.non_calc || []
+    non_calc: dataObject[dataId].non_calc || []
   }));
 
-  const itemsWithIssues = dataItems.filter(item => item.non_calc.length > 0);
-
-  if (itemsWithIssues.length === 0) {
+  if (dataItems.length === 0) {
     return (
       <div className="bg-gray-800 rounded-xl p-8 text-center">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-500/20 mb-4">
@@ -145,7 +142,7 @@ export default function ModalDataTable({ DataValidationResponse, validationType,
     <div className="bg-gray-800 rounded-xl p-5">
       <div className="flex justify-between items-center mb-4">
         <h4 className="font-medium text-gray-400 text-xl">
-          Data Validation Issues ({itemsWithIssues.length} data entries with issues)
+          Data Validation Issues ({dataItems.length} data entries)
         </h4>
         <span className="text-sm text-gray-500">
           Click on <KeyboardArrowDownIcon fontSize="small" /> to see details for each data entry
@@ -177,7 +174,7 @@ export default function ModalDataTable({ DataValidationResponse, validationType,
             </TableRow>
           </TableHead>
           <TableBody>
-            {itemsWithIssues.map((dataItem) => (
+            {dataItems.map((dataItem) => (
               <DataRow 
                 key={dataItem.dataId}
                 dataItem={dataItem}

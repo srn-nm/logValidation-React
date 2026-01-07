@@ -113,13 +113,17 @@ export default function ChooseSchema() {
     }
   };
 
-  const processApiResponseDataCheck = (apiData: any, selectedSchema: any): DataValidationResponse => {
-  const schemaId = selectedSchema.id.toString();
-  
-  return {
-    [schemaId]: apiData.root
+  const processApiResponseDataCheck = (apiData: any, selectedSchema: any) => {
+    
+    const schemaId = selectedSchema.id.toString();
+            
+    return {
+      id: selectedSchema.id,
+      description: selectedSchema.description,
+      root: apiData[schemaId],
+      schemaId: schemaId
+    };
   };
-};
 
   const closeModal = () => {
     setShowModal(false);
@@ -239,7 +243,7 @@ export default function ChooseSchema() {
       {showModal && dataValidationResponse && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
           <div className="relative w-full max-w-6xl max-h-[90vh] bg-gray-900 rounded-2xl shadow-2xl border border-gray-700 overflow-hidden">
-            {validationType == "data" && (
+            {validationType == "schema" && (
             <>
               <ModalHeaderData validationResponse={dataValidationResponse} validationType={validationType} closeModal={closeModal} selectedSchema={selectedSchema}/>
               <ModalContentData validationResponse={dataValidationResponse} validationType={validationType} getStatusColor={getStatusColor} /> 
