@@ -1,20 +1,22 @@
 import { useState } from "react";
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headlessui/react";
-import { CheckIcon, XMarkIcon } from "@heroicons/react/20/solid";
+import { CheckIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
 import HARDCODED_SCHEMA_LIST from "../constants/SchemasList"; 
 import axios from "axios";
+import ModalHeader from "./ModalHeader";
+import ModalContent from "./ModalContent";
 
 export default function ChooseSchema() {
   const [selectedSchema, setSelectedSchema] = useState(HARDCODED_SCHEMA_LIST[0]);
   const [isChecking, setIsChecking] = useState(false);
-  const [validationData, setValidationData] = useState<any | null>(null);
+  const [validationResponse, setValidationResponse] = useState<any | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [validationType, setValidationType] = useState<"schema" | "data" | null>(null);
 
   const handleSchemaValidationBySchemaID = async () => {
     setValidationType("schema");
-    setValidationData(null);
+    setValidationResponse(null);
     setIsChecking(true);
     setShowModal(false);
 
@@ -34,18 +36,14 @@ export default function ChooseSchema() {
           }
         }
       );
-
-      console.log("API Response data:", res.data);
       
-      // Process the API response
-      const processedData = processApiResponse(res.data, selectedSchema);
-      setValidationData(processedData);
+      const processedData = processApiResponseSchemaCheck(res.data, selectedSchema);
+      setValidationResponse(processedData);
       setShowModal(true);
 
     } catch (error) {
       console.error("Error checking schema:", error);
-      // Show error state
-      setValidationData({
+      setValidationResponse({
         id: selectedSchema.id,
         description: selectedSchema.description,
         root: [],
@@ -57,68 +55,74 @@ export default function ChooseSchema() {
     }
   };
 
-  // Helper function to process API response
-  const processApiResponse = (apiData: any, selectedSchema: any) => {
-    console.log("Processing API data:", apiData);
+  const processApiResponseSchemaCheck = (apiData: any, selectedSchema: any) => {
     
     const schemaId = selectedSchema.id.toString();
-    
-    // Check if the API response has data for this schema ID
-    if (apiData[schemaId] && apiData[schemaId].root) {
-      // The API returns: { "27": { "root": [...] } }
-      const rootArray = apiData[schemaId].root;
-      
-      console.log("Found root array with", rootArray.length, "items");
-      
-      return {
-        id: selectedSchema.id,
-        description: selectedSchema.description,
-        root: rootArray, // Use the root array directly
-        schemaId: schemaId
-      };
-      
-    } else if (apiData[schemaId]) {
-      // Has schema ID key but no root property
-      return {
-        id: selectedSchema.id,
-        description: selectedSchema.description,
-        root: [],
-        note: "No validation issues found for this schema"
-      };
-      
-    } else {
-      // No data found for this schema ID
-      return {
-        id: selectedSchema.id,
-        description: selectedSchema.description,
-        root: [],
-        note: "No validation data available for this schema"
-      };
-    }
+    const rootArray = apiData[schemaId].root;
+            
+    return {
+      id: selectedSchema.id,
+      description: selectedSchema.description,
+      root: rootArray,
+      schemaId: schemaId
+    };
   };
 
   const handleDataValidationBySchemaID = async () => {
-    // todo - implement data validation
     setValidationType("data");
+    setValidationResponse(null);
     setIsChecking(true);
-    
-    // For now, just show a placeholder
-    setTimeout(() => {
-      setValidationData({
+    setShowModal(false);
+
+    try {
+      const res = await axios.get(
+        `http://172.16.20.134:8080/api/v1/data/validation/schema/${selectedSchema.id}`,
+        {
+          params: {
+            calc_validation: false,
+            deep_check: false,
+            max_depth: 1,
+            lang: "en",
+          },
+          headers: {
+            Accept: `application/json`,
+            Authorization: `Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MDNjZjZjNS1jNzRmLTRjMmYtYWNmNS1iMWE4ODBlMTkxNGUiLCJleHAiOjE3Njg3NDM2MzAsImlhdCI6MTc2MDk2NzYzMCwibmJmIjoxNzYwOTY3NjMwLCJqdGkiOiJlY2NkZmRmYy1jYTMxLTQ3MTgtOWViNi1hNGIxY2FkNjgyZTUiLCJyb2xlcyI6WyJ1c2VyIl0sInNjb3BlcyI6WyJyZXBvcnQ6cmVhZCIsInJlcG9ydDp3cml0ZSIsInRlbXBsYXRlOnJlYWQiLCJ0ZW1wbGF0ZTp3cml0ZSJdfQ.0R7-zA-eCojvBkCwjUZmSlEXgrVN1V8VMB2bgIThCGtrimdvUKB_Cvef0NAkpXuK4fdVxTassBLGRZTajVp1lfcrNA6hFucJ8le_eECEbb4sfolWeM3qUEzHrD3Kg4_RGObFfcbuRM7Zb2InQEGl-GryxuQ5r9nI8eMMpM1fBJlA7hnKCPgVNA9tP_FCpcpdb0MgziVPyVndKXdul0qKppJpjJJN40m_UQv9i9Xa_yuCNxgWRe4snhSWndCQsbkNOEuYI6egEoF4nsEPZ4cUdXIDjxx1EPdhG0p8s31_IBrg1b9P4qBRd_v-wa4srHOpeOqCAlMevEKQFL71QroYMQ`,
+          }
+        }
+      );
+      
+      const processedData = processApiResponseDataCheck(res.data, selectedSchema);
+      setValidationResponse(processedData);
+      setShowModal(true);
+
+    } catch (error) {
+      setValidationResponse({
         id: selectedSchema.id,
         description: selectedSchema.description,
-        type: "data_validation",
         root: [],
-        note: "Data validation not implemented yet"
+        error: "Failed to fetch validation data"
       });
       setShowModal(true);
+    } finally {
       setIsChecking(false);
-    }, 500);
+    }
+  };
+
+  const processApiResponseDataCheck = (apiData: any, selectedSchema: any) => {
+    
+    const schemaId = selectedSchema.id.toString();
+            
+    return {
+      id: selectedSchema.id,
+      description: selectedSchema.description,
+      root: apiData[schemaId],
+      schemaId: schemaId
+    };
   };
 
   const closeModal = () => {
     setShowModal(false);
-    setValidationData(null);
+    setValidationResponse(null);
     setValidationType(null);
   };
 
@@ -219,168 +223,13 @@ export default function ChooseSchema() {
         }
       </div>
 
-      {/* Modal Overlay */}
-      {showModal && validationData && (
+      {showModal && validationResponse && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          {/* Modal Container */}
           <div className="relative w-full max-w-6xl max-h-[90vh] bg-gray-900 rounded-2xl shadow-2xl border border-gray-700 overflow-hidden">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-700 bg-gray-800">
-              <div>
-                <h2 className="text-2xl font-bold text-white">
-                  {validationType === "schema" ? "Schema Validation Results" : "Data Validation Results"}
-                </h2>
-                <p className="text-gray-400 mt-1">
-                  Schema: {validationData.id} - {validationData.description}
-                </p>
-                {validationData.note && (
-                  <p className="text-yellow-400 text-sm mt-1 bg-yellow-500/10 p-2 rounded">
-                    ⚠️ {validationData.note}
-                  </p>
-                )}
-                {validationData.error && (
-                  <p className="text-red-400 text-sm mt-1 bg-red-500/10 p-2 rounded">
-                    ❌ {validationData.error}
-                  </p>
-                )}
-                <div className="flex items-center gap-2 mt-2">
-                  <span className={`px-2 py-1 text-xs rounded-full ${validationData.root?.length > 0 ? 'bg-yellow-500/20 text-yellow-300' : 'bg-green-500/20 text-green-300'}`}>
-                    {validationData.root?.length > 0 ? `${validationData.root.length} Issues Found` : 'No Issues Found'}
-                  </span>
-                  {validationType === "data" && (
-                    <span className="px-2 py-1 text-xs bg-green-500/20 text-green-300 rounded-full">
-                      Data Validation
-                    </span>
-                  )}
-                  {validationData.type && (
-                    <span className="px-2 py-1 text-xs bg-blue-500/20 text-blue-300 rounded-full">
-                      {validationData.type}
-                    </span>
-                  )}
-                </div>
-              </div>
-              
-              {/* Close Button */}
-              <button
-                onClick={closeModal}
-                className="p-2 rounded-lg hover:bg-gray-700 transition-colors duration-150"
-                aria-label="Close modal"
-              >
-                <XMarkIcon className="h-8 w-8 text-gray-400 hover:text-white" />
-              </button>
-            </div>
-
-            {/* Modal Content */}
-            <div className="p-6 overflow-auto max-h-[calc(90vh-120px)]">
-                <div className="space-y-6">
-                  {/* Summary Cards */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="bg-gray-800 rounded-xl p-4">
-                      <h4 className="font-medium text-gray-400">Schema ID</h4>
-                      <p className="text-white text-lg font-mono">{validationData.id}</p>
-                    </div>
-                    
-                    <div className="bg-gray-800 rounded-xl p-4">
-                      <h4 className="font-medium text-gray-400">Total Issues</h4>
-                      <p className={`text-lg font-semibold ${validationData.root?.length > 0 ? 'text-yellow-400' : 'text-green-400'}`}>
-                        {validationData.root?.length || 0}
-                      </p>
-                    </div>
-                    
-                    <div className="bg-gray-800 rounded-xl p-4">
-                      <h4 className="font-medium text-gray-400">Validation Type</h4>
-                      <p className="text-white text-lg">
-                        {validationType === "schema" ? "Schema Check" : "Data Check"}
-                        {validationData.type && ` (${validationData.type})`}
-                      </p>
-                    </div>
-                    
-                    <div className="bg-gray-800 rounded-xl p-4">
-                      <h4 className="font-medium text-gray-400">Status</h4>
-                      <p className={`text-lg font-semibold ${validationData.root?.length > 0 ? 'text-yellow-400' : 'text-green-400'}`}>
-                        {validationData.root?.length > 0 ? "Issues Found" : "Valid"}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Issues Table - Only show if there are issues */}
-                  {validationData.root && validationData.root.length > 0 ? (
-                    <div className="bg-gray-800 rounded-xl p-5">
-                      <h4 className="font-medium text-gray-400 mb-4 text-xl">
-                        Validation Issues ({validationData.root.length})
-                      </h4>
-                      <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-700">
-                          <thead>
-                            <tr>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">#</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Field</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Type</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Code</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Level</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Detail</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-gray-700">
-                            {validationData.root.map((error: any, index: number) => (
-                              <tr key={index} className="hover:bg-gray-700/50 transition-colors">
-                                <td className="px-4 py-3 text-gray-400 font-mono">
-                                  {index + 1}
-                                </td>
-                                <td className="px-4 py-3 text-blue-400 font-mono">
-                                  {error.field}
-                                </td>
-                                <td className="px-4 py-3 text-gray-300">
-                                  {error.type}
-                                </td>
-                                <td className="px-4 py-3 font-mono">
-                                  <span className="px-2 py-1 text-xs bg-purple-500/20 text-purple-300 rounded-full">
-                                    {error.code}
-                                  </span>
-                                </td>
-                                <td className="px-4 py-3">
-                                  <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(error.level)}`}>
-                                    {error.level}
-                                  </span>
-                                </td>
-                                <td className="px-4 py-3 text-gray-300">
-                                  {error.detail?.en || error.detail}
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="bg-gray-800 rounded-xl p-8 text-center">
-                      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-500/20 mb-4">
-                        <CheckIcon className="h-8 w-8 text-green-400" />
-                      </div>
-                      <h3 className="text-xl font-semibold text-white mb-2">No Issues Found!</h3>
-                      <p className="text-gray-400">
-                        The {validationType === "schema" ? "schema" : "data"} has passed all validation checks.
-                      </p>
-                      {validationData.note && (
-                        <p className="text-gray-500 mt-2 text-sm">
-                          {validationData.note}
-                        </p>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Raw JSON View */}
-                  <div className="bg-gray-800 rounded-xl p-5">
-                    <div className="flex justify-between items-center mb-4">
-                      <h4 className="font-medium text-gray-400">Raw JSON Data</h4>
-                      <span className="text-xs text-gray-500">For debugging purposes</span>
-                    </div>
-                    <pre className="text-sm text-gray-300 bg-gray-900/50 p-4 rounded-lg overflow-x-auto max-h-64">
-                      {JSON.stringify(validationData, null, 2)}
-                    </pre>
-                  </div>
-                </div>
-            </div>
+            
+            <ModalHeader validationData={validationResponse} validationType={validationType} closeModal={closeModal}/>
+            <ModalContent validationData={validationResponse} validationType={validationType} getStatusColor={getStatusColor}/>
+          
           </div>
         </div>
       )}

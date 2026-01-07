@@ -8,43 +8,13 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import type DataValidationResponse from '../types/dataValidationResponse';
 
-function createData(
-  name: string,
-  calories: number,
-  fat: number,
-  carbs: number,
-  protein: number,
-  price: number,
-) {
-  return {
-    name,
-    calories,
-    fat,
-    carbs,
-    protein,
-    price,
-    history: [
-      {
-        date: '2020-01-05',
-        customerId: '11091700',
-        amount: 3,
-      },
-      {
-        date: '2020-01-02',
-        customerId: 'Anonymous',
-        amount: 1,
-      },
-    ],
-  };
-}
-
-function Row(props: { row: ReturnType<typeof createData> }) {
-  const { row } = props;
+function Row({id, field, type, code, level, detail}: DataValidationResponse ) {
+  const row = {id, field, type, code, level, detail};
   const [open, setOpen] = React.useState(false);
 
   return (
@@ -60,27 +30,24 @@ function Row(props: { row: ReturnType<typeof createData> }) {
           </IconButton>
         </TableCell>
         <TableCell component="th" scope="row">
-          {row.name}
+          {row.id}
         </TableCell>
-        <TableCell align="right">{row.calories}</TableCell>
+        <TableCell align="right">{}</TableCell>
         <TableCell align="right">{row.fat}</TableCell>
         <TableCell align="right">{row.carbs}</TableCell>
-        <TableCell align="right">{row.protein}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
-              <Typography variant="h6" gutterBottom component="div">
-                History
-              </Typography>
               <Table size="small" aria-label="purchases">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Date</TableCell>
-                    <TableCell>Customer</TableCell>
-                    <TableCell align="right">Amount</TableCell>
-                    <TableCell align="right">Total price ($)</TableCell>
+                    <TableCell>Field</TableCell>
+                    <TableCell>Type</TableCell>
+                    <TableCell align="right">Code</TableCell>
+                    <TableCell align="right">Level</TableCell>
+                    <TableCell align="right">Detail</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -106,11 +73,513 @@ function Row(props: { row: ReturnType<typeof createData> }) {
   );
 }
 const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0, 3.99),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3, 4.99),
-  createData('Eclair', 262, 16.0, 24, 6.0, 3.79),
-  createData('Cupcake', 305, 3.7, 67, 4.3, 2.5),
-  createData('Gingerbread', 356, 16.0, 49, 3.9, 1.5),
+ 
+    "104379": {
+      "non_calc": [
+        {
+          "_id": null,
+          "field": "TYPE",
+          "type": "data",
+          "code": "REQUIRED",
+          "level": "ERROR",
+          "detail": {
+            "en": "'TYPE' is required",
+            "fa": " الزامی است ‏'نوع مفاصاحساب'"
+          }
+        },
+        {
+          "_id": null,
+          "field": "OLD_ID",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'OLD_ID' is missing",
+            "fa": "شناسه قدیمی ناموجود است"
+          }
+        },
+        {
+          "_id": null,
+          "field": "ACC_SETTLE",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'ACC_SETTLE' is missing",
+            "fa": "فرم تسویه حساب ناموجود است"
+          }
+        }
+      ]
+    },
+    "104380": {
+      "non_calc": [
+        {
+          "_id": null,
+          "field": "DESCR",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'DESCR' is missing",
+            "fa": "توضیحات ناموجود است"
+          }
+        },
+        {
+          "_id": null,
+          "field": "OLD_ID",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'OLD_ID' is missing",
+            "fa": "شناسه قدیمی ناموجود است"
+          }
+        },
+        {
+          "_id": null,
+          "field": "ACC_SETTLE",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'ACC_SETTLE' is missing",
+            "fa": "فرم تسویه حساب ناموجود است"
+          }
+        }
+      ]
+    },
+    "104381": {
+      "non_calc": [
+        {
+          "_id": null,
+          "field": "DESCR",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'DESCR' is missing",
+            "fa": "توضیحات ناموجود است"
+          }
+        },
+        {
+          "_id": null,
+          "field": "OLD_ID",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'OLD_ID' is missing",
+            "fa": "شناسه قدیمی ناموجود است"
+          }
+        },
+        {
+          "_id": null,
+          "field": "ACC_SETTLE",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'ACC_SETTLE' is missing",
+            "fa": "فرم تسویه حساب ناموجود است"
+          }
+        }
+      ]
+    },
+    "104382": {
+      "non_calc": [
+        {
+          "_id": null,
+          "field": "TYPE",
+          "type": "data",
+          "code": "REQUIRED",
+          "level": "ERROR",
+          "detail": {
+            "en": "'TYPE' is required",
+            "fa": " الزامی است ‏'نوع مفاصاحساب'"
+          }
+        },
+        {
+          "_id": null,
+          "field": "DESCR",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'DESCR' is missing",
+            "fa": "توضیحات ناموجود است"
+          }
+        },
+        {
+          "_id": null,
+          "field": "OLD_ID",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'OLD_ID' is missing",
+            "fa": "شناسه قدیمی ناموجود است"
+          }
+        },
+        {
+          "_id": null,
+          "field": "ACC_SETTLE",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'ACC_SETTLE' is missing",
+            "fa": "فرم تسویه حساب ناموجود است"
+          }
+        }
+      ]
+    },
+    "104383": {
+      "non_calc": [
+        {
+          "_id": null,
+          "field": "TYPE",
+          "type": "data",
+          "code": "REQUIRED",
+          "level": "ERROR",
+          "detail": {
+            "en": "'TYPE' is required",
+            "fa": " الزامی است ‏'نوع مفاصاحساب'"
+          }
+        },
+        {
+          "_id": null,
+          "field": "DESCR",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'DESCR' is missing",
+            "fa": "توضیحات ناموجود است"
+          }
+        },
+        {
+          "_id": null,
+          "field": "OLD_ID",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'OLD_ID' is missing",
+            "fa": "شناسه قدیمی ناموجود است"
+          }
+        },
+        {
+          "_id": null,
+          "field": "ACC_SETTLE",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'ACC_SETTLE' is missing",
+            "fa": "فرم تسویه حساب ناموجود است"
+          }
+        }
+      ]
+    },
+    "104384": {
+      "non_calc": [
+        {
+          "_id": null,
+          "field": "TYPE",
+          "type": "data",
+          "code": "REQUIRED",
+          "level": "ERROR",
+          "detail": {
+            "en": "'TYPE' is required",
+            "fa": " الزامی است ‏'نوع مفاصاحساب'"
+          }
+        },
+        {
+          "_id": null,
+          "field": "DESCR",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'DESCR' is missing",
+            "fa": "توضیحات ناموجود است"
+          }
+        },
+        {
+          "_id": null,
+          "field": "OLD_ID",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'OLD_ID' is missing",
+            "fa": "شناسه قدیمی ناموجود است"
+          }
+        },
+        {
+          "_id": null,
+          "field": "ACC_SETTLE",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'ACC_SETTLE' is missing",
+            "fa": "فرم تسویه حساب ناموجود است"
+          }
+        }
+      ]
+    },
+    "104385": {
+      "non_calc": [
+        {
+          "_id": null,
+          "field": "TYPE",
+          "type": "data",
+          "code": "REQUIRED",
+          "level": "ERROR",
+          "detail": {
+            "en": "'TYPE' is required",
+            "fa": " الزامی است ‏'نوع مفاصاحساب'"
+          }
+        },
+        {
+          "_id": null,
+          "field": "DESCR",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'DESCR' is missing",
+            "fa": "توضیحات ناموجود است"
+          }
+        },
+        {
+          "_id": null,
+          "field": "OLD_ID",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'OLD_ID' is missing",
+            "fa": "شناسه قدیمی ناموجود است"
+          }
+        },
+        {
+          "_id": null,
+          "field": "ACC_SETTLE",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'ACC_SETTLE' is missing",
+            "fa": "فرم تسویه حساب ناموجود است"
+          }
+        }
+      ]
+    },
+    "104386": {
+      "non_calc": [
+        {
+          "_id": null,
+          "field": "TYPE",
+          "type": "data",
+          "code": "REQUIRED",
+          "level": "ERROR",
+          "detail": {
+            "en": "'TYPE' is required",
+            "fa": " الزامی است ‏'نوع مفاصاحساب'"
+          }
+        },
+        {
+          "_id": null,
+          "field": "DESCR",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'DESCR' is missing",
+            "fa": "توضیحات ناموجود است"
+          }
+        },
+        {
+          "_id": null,
+          "field": "OLD_ID",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'OLD_ID' is missing",
+            "fa": "شناسه قدیمی ناموجود است"
+          }
+        },
+        {
+          "_id": null,
+          "field": "ACC_SETTLE",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'ACC_SETTLE' is missing",
+            "fa": "فرم تسویه حساب ناموجود است"
+          }
+        }
+      ]
+    },
+    "104387": {
+      "non_calc": [
+        {
+          "_id": null,
+          "field": "TYPE",
+          "type": "data",
+          "code": "REQUIRED",
+          "level": "ERROR",
+          "detail": {
+            "en": "'TYPE' is required",
+            "fa": " الزامی است ‏'نوع مفاصاحساب'"
+          }
+        },
+        {
+          "_id": null,
+          "field": "DESCR",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'DESCR' is missing",
+            "fa": "توضیحات ناموجود است"
+          }
+        },
+        {
+          "_id": null,
+          "field": "OLD_ID",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'OLD_ID' is missing",
+            "fa": "شناسه قدیمی ناموجود است"
+          }
+        },
+        {
+          "_id": null,
+          "field": "ACC_SETTLE",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'ACC_SETTLE' is missing",
+            "fa": "فرم تسویه حساب ناموجود است"
+          }
+        }
+      ]
+    },
+    "104388": {
+      "non_calc": [
+        {
+          "_id": null,
+          "field": "TYPE",
+          "type": "data",
+          "code": "REQUIRED",
+          "level": "ERROR",
+          "detail": {
+            "en": "'TYPE' is required",
+            "fa": " الزامی است 'نوع مفاصاحساب'"
+          }
+        },
+        {
+          "_id": null,
+          "field": "DESCR",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'DESCR' is missing",
+            "fa": "توضیحات ناموجود است"
+          }
+        },
+        {
+          "_id": null,
+          "field": "OLD_ID",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'OLD_ID' is missing",
+            "fa": "شناسه قدیمی ناموجود است"
+          }
+        },
+        {
+          "_id": null,
+          "field": "ACC_SETTLE",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'ACC_SETTLE' is missing",
+            "fa": "فرم تسویه حساب ناموجود است"
+          }
+        }
+      ]
+    },
+    "113933": {
+      "non_calc": [
+        {
+          "_id": null,
+          "field": "SCAN",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'SCAN' is missing",
+            "fa": "فرم مفاصاحساب ناموجود است"
+          }
+        },
+        {
+          "_id": null,
+          "field": "DESCR",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'DESCR' is missing",
+            "fa": "توضیحات ناموجود است"
+          }
+        },
+        {
+          "_id": null,
+          "field": "OLD_ID",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'OLD_ID' is missing",
+            "fa": "شناسه قدیمی ناموجود است"
+          }
+        },
+        {
+          "_id": null,
+          "field": "ACC_SETTLE",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'ACC_SETTLE' is missing",
+            "fa": "فرم تسویه حساب ناموجود است"
+          }
+        },
+        {
+          "_id": null,
+          "field": "COEF_CALCULATE",
+          "type": "data",
+          "code": "MISSING",
+          "level": "WARNING",
+          "detail": {
+            "en": "'COEF_CALCULATE' is missing",
+            "fa": "ضریب محاسبه پیمان ناموجود است"
+          }
+        }
+      ]
+    }
 ];
 export default function CollapsibleTable() {
   return (
@@ -119,19 +588,531 @@ export default function CollapsibleTable() {
         <TableHead>
           <TableRow>
             <TableCell />
-            <TableCell>Dessert (100g serving)</TableCell>
-            <TableCell align="right">Calories</TableCell>
-            <TableCell align="right">Fat&nbsp;(g)</TableCell>
-            <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-            <TableCell align="right">Protein&nbsp;(g)</TableCell>
+            <TableCell>Data ID</TableCell>
+            <TableCell align="right">Issues</TableCell>
+            <TableCell align="right">Warnings</TableCell>
+            <TableCell align="right">Errors</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {rows.map((row) => (
-            <Row key={row.name} row={row} />
+            <Row key={row.id} row={row} />
           ))}
         </TableBody>
       </Table>
     </TableContainer>
   );
 }
+
+
+// sample request response:
+// {
+//   "131": {
+//     "104379": {
+//       "non_calc": [
+//         {
+//           "_id": null,
+//           "field": "TYPE",
+//           "type": "data",
+//           "code": "REQUIRED",
+//           "level": "ERROR",
+//           "detail": {
+//             "en": "'TYPE' is required",
+//             "fa": " الزامی است ‏'نوع مفاصاحساب'"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "OLD_ID",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'OLD_ID' is missing",
+//             "fa": "شناسه قدیمی ناموجود است"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "ACC_SETTLE",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'ACC_SETTLE' is missing",
+//             "fa": "فرم تسویه حساب ناموجود است"
+//           }
+//         }
+//       ]
+//     },
+//     "104380": {
+//       "non_calc": [
+//         {
+//           "_id": null,
+//           "field": "DESCR",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'DESCR' is missing",
+//             "fa": "توضیحات ناموجود است"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "OLD_ID",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'OLD_ID' is missing",
+//             "fa": "شناسه قدیمی ناموجود است"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "ACC_SETTLE",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'ACC_SETTLE' is missing",
+//             "fa": "فرم تسویه حساب ناموجود است"
+//           }
+//         }
+//       ]
+//     },
+//     "104381": {
+//       "non_calc": [
+//         {
+//           "_id": null,
+//           "field": "DESCR",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'DESCR' is missing",
+//             "fa": "توضیحات ناموجود است"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "OLD_ID",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'OLD_ID' is missing",
+//             "fa": "شناسه قدیمی ناموجود است"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "ACC_SETTLE",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'ACC_SETTLE' is missing",
+//             "fa": "فرم تسویه حساب ناموجود است"
+//           }
+//         }
+//       ]
+//     },
+//     "104382": {
+//       "non_calc": [
+//         {
+//           "_id": null,
+//           "field": "TYPE",
+//           "type": "data",
+//           "code": "REQUIRED",
+//           "level": "ERROR",
+//           "detail": {
+//             "en": "'TYPE' is required",
+//             "fa": " الزامی است ‏'نوع مفاصاحساب'"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "DESCR",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'DESCR' is missing",
+//             "fa": "توضیحات ناموجود است"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "OLD_ID",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'OLD_ID' is missing",
+//             "fa": "شناسه قدیمی ناموجود است"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "ACC_SETTLE",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'ACC_SETTLE' is missing",
+//             "fa": "فرم تسویه حساب ناموجود است"
+//           }
+//         }
+//       ]
+//     },
+//     "104383": {
+//       "non_calc": [
+//         {
+//           "_id": null,
+//           "field": "TYPE",
+//           "type": "data",
+//           "code": "REQUIRED",
+//           "level": "ERROR",
+//           "detail": {
+//             "en": "'TYPE' is required",
+//             "fa": " الزامی است ‏'نوع مفاصاحساب'"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "DESCR",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'DESCR' is missing",
+//             "fa": "توضیحات ناموجود است"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "OLD_ID",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'OLD_ID' is missing",
+//             "fa": "شناسه قدیمی ناموجود است"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "ACC_SETTLE",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'ACC_SETTLE' is missing",
+//             "fa": "فرم تسویه حساب ناموجود است"
+//           }
+//         }
+//       ]
+//     },
+//     "104384": {
+//       "non_calc": [
+//         {
+//           "_id": null,
+//           "field": "TYPE",
+//           "type": "data",
+//           "code": "REQUIRED",
+//           "level": "ERROR",
+//           "detail": {
+//             "en": "'TYPE' is required",
+//             "fa": " الزامی است ‏'نوع مفاصاحساب'"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "DESCR",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'DESCR' is missing",
+//             "fa": "توضیحات ناموجود است"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "OLD_ID",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'OLD_ID' is missing",
+//             "fa": "شناسه قدیمی ناموجود است"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "ACC_SETTLE",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'ACC_SETTLE' is missing",
+//             "fa": "فرم تسویه حساب ناموجود است"
+//           }
+//         }
+//       ]
+//     },
+//     "104385": {
+//       "non_calc": [
+//         {
+//           "_id": null,
+//           "field": "TYPE",
+//           "type": "data",
+//           "code": "REQUIRED",
+//           "level": "ERROR",
+//           "detail": {
+//             "en": "'TYPE' is required",
+//             "fa": " الزامی است ‏'نوع مفاصاحساب'"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "DESCR",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'DESCR' is missing",
+//             "fa": "توضیحات ناموجود است"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "OLD_ID",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'OLD_ID' is missing",
+//             "fa": "شناسه قدیمی ناموجود است"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "ACC_SETTLE",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'ACC_SETTLE' is missing",
+//             "fa": "فرم تسویه حساب ناموجود است"
+//           }
+//         }
+//       ]
+//     },
+//     "104386": {
+//       "non_calc": [
+//         {
+//           "_id": null,
+//           "field": "TYPE",
+//           "type": "data",
+//           "code": "REQUIRED",
+//           "level": "ERROR",
+//           "detail": {
+//             "en": "'TYPE' is required",
+//             "fa": " الزامی است ‏'نوع مفاصاحساب'"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "DESCR",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'DESCR' is missing",
+//             "fa": "توضیحات ناموجود است"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "OLD_ID",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'OLD_ID' is missing",
+//             "fa": "شناسه قدیمی ناموجود است"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "ACC_SETTLE",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'ACC_SETTLE' is missing",
+//             "fa": "فرم تسویه حساب ناموجود است"
+//           }
+//         }
+//       ]
+//     },
+//     "104387": {
+//       "non_calc": [
+//         {
+//           "_id": null,
+//           "field": "TYPE",
+//           "type": "data",
+//           "code": "REQUIRED",
+//           "level": "ERROR",
+//           "detail": {
+//             "en": "'TYPE' is required",
+//             "fa": " الزامی است ‏'نوع مفاصاحساب'"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "DESCR",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'DESCR' is missing",
+//             "fa": "توضیحات ناموجود است"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "OLD_ID",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'OLD_ID' is missing",
+//             "fa": "شناسه قدیمی ناموجود است"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "ACC_SETTLE",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'ACC_SETTLE' is missing",
+//             "fa": "فرم تسویه حساب ناموجود است"
+//           }
+//         }
+//       ]
+//     },
+//     "104388": {
+//       "non_calc": [
+//         {
+//           "_id": null,
+//           "field": "TYPE",
+//           "type": "data",
+//           "code": "REQUIRED",
+//           "level": "ERROR",
+//           "detail": {
+//             "en": "'TYPE' is required",
+//             "fa": " الزامی است ‏'نوع مفاصاحساب'"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "DESCR",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'DESCR' is missing",
+//             "fa": "توضیحات ناموجود است"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "OLD_ID",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'OLD_ID' is missing",
+//             "fa": "شناسه قدیمی ناموجود است"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "ACC_SETTLE",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'ACC_SETTLE' is missing",
+//             "fa": "فرم تسویه حساب ناموجود است"
+//           }
+//         }
+//       ]
+//     },
+//     "113933": {
+//       "non_calc": [
+//         {
+//           "_id": null,
+//           "field": "SCAN",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'SCAN' is missing",
+//             "fa": "فرم مفاصاحساب ناموجود است"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "DESCR",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'DESCR' is missing",
+//             "fa": "توضیحات ناموجود است"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "OLD_ID",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'OLD_ID' is missing",
+//             "fa": "شناسه قدیمی ناموجود است"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "ACC_SETTLE",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'ACC_SETTLE' is missing",
+//             "fa": "فرم تسویه حساب ناموجود است"
+//           }
+//         },
+//         {
+//           "_id": null,
+//           "field": "COEF_CALCULATE",
+//           "type": "data",
+//           "code": "MISSING",
+//           "level": "WARNING",
+//           "detail": {
+//             "en": "'COEF_CALCULATE' is missing",
+//             "fa": "ضریب محاسبه پیمان ناموجود است"
+//           }
+//         }
+//       ]
+//     }
+//   }
+// }
