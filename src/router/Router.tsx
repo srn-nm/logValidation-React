@@ -4,7 +4,7 @@ import PrivateRoute from "../components/PrivateRoute";
 import ErrorElement from "../components/ErrorElement";
 import LoginPage from "../pages/LoginPage"
 import Dashboard from "../pages/Dashboard";
-import FormValidation from "../pages/FormValidation"
+import DataValidation from "../pages/DataValidation"
 import SchemaValidation from "../pages/SchemaValidation"
 
 const router = createBrowserRouter([
@@ -29,8 +29,8 @@ const router = createBrowserRouter([
             element: <Dashboard />,
           },
           {
-            path: "FormValidation",
-            element: <FormValidation />,
+            path: "DataValidation",
+            element: <DataValidation />,
           },
           {
             path: "SchemaValidation",

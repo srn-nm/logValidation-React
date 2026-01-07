@@ -7,10 +7,12 @@ export default function Layout() {
 
   return (
     
-    <Box className="flex justify-end min-h-screen min-w-screen bg-gray-100 dark:bg-gray-900 transition-colors stretch">
-      
+    <Box
+      className="flex justify-end min-h-screen min-w-screen bg-cover bg-center bg-no-repeat transition-colors"
+      sx={{ backgroundImage: "url(/Background.jpg)" }}
+    >
       <Box className="flex flex-col flex-1 min-h-screen h-full stretch">
-        <img></img>
+        
         <NavBar />
         <motion.main
           className="flex-1 h-full stretch"
@@ -27,5 +29,6 @@ export default function Layout() {
       </Box>
       
     </Box>
+ 
   );
 }

@@ -3,7 +3,7 @@ import CollapsibleTable from "../components/CollapsibleTable";
 export default function FormValidation() {
     return (
         <>
-        form validation test
+        data validation test
         <CollapsibleTable></CollapsibleTable>
         </>
     );
