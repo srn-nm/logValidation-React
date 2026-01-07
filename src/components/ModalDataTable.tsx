@@ -114,12 +114,13 @@ interface Props {
 }
 
 export default function ModalDataTable({ DataValidationResponse, validationType, getStatusColor }: Props) {
+  console.log("DataValidationResponse ", DataValidationResponse)
   const schemaId = Object.keys(DataValidationResponse)[0];
-  const dataObject = DataValidationResponse[schemaId].root;
+  const dataObject = DataValidationResponse[schemaId];
   
   const dataItems: DataItem[] = Object.keys(dataObject).map(dataId => ({
     dataId,
-    non_calc: dataObject[dataId].non_calc || []
+    non_calc: dataObject.root[dataId] || []
   }));
 
   if (dataItems.length === 0) {
@@ -144,9 +145,6 @@ export default function ModalDataTable({ DataValidationResponse, validationType,
         <h4 className="font-medium text-gray-400 text-xl">
           Data Validation Issues ({dataItems.length} data entries)
         </h4>
-        <span className="text-sm text-gray-500">
-          Click on <KeyboardArrowDownIcon fontSize="small" /> to see details for each data entry
-        </span>
       </div>
       
       <TableContainer 

@@ -46,9 +46,6 @@ export default function ModalHeaderData({ validationResponse, validationType, cl
           <p className="text-gray-400 mt-1">
             Schema: {selectedSchema.id} - {selectedSchema.description}
           </p>
-          <p className="text-sm text-gray-500 mt-1">
-            Found {totalDataEntries} data entries with validation results
-          </p>
           
           {(validationResponse as any).error && (
             <p className="text-red-400 text-sm mt-1 bg-red-500/10 p-2 rounded">
@@ -92,7 +89,7 @@ export default function ModalHeaderData({ validationResponse, validationType, cl
             <div className="mt-3 text-xs text-gray-400">
               <p>
                 Analyzed {totalDataEntries} data entries • 
-                {totalErrors > 0 && <span className="text-red-300 ml-2"> {totalErrors} critical errors</span>}
+                {totalErrors > 0 && <span className="text-red-300 ml-2"> {totalErrors} errors</span>}
                 {totalWarnings > 0 && <span className="text-yellow-300 ml-2"> {totalWarnings} warnings</span>}
               </p>
             </div>

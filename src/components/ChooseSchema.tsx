@@ -7,7 +7,7 @@ import axios from "axios";
 import ModalHeaderSchema from "./ModalHeaderSchema";
 import ModalContentSchema from "./ModalContentSchema";
 import type SchemaValidationResponse from "../types/schemaValidationResponse";
-import type DataValidationResponse from "../types/dataValidationResponse";
+import type DataValidationResponse from "../types/DataValidationResponse";
 import ModalHeaderData from "./ModalHeaderData";
 import ModalContentData from "./ModalContentData";
 
@@ -243,7 +243,7 @@ export default function ChooseSchema() {
       {showModal && dataValidationResponse && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
           <div className="relative w-full max-w-6xl max-h-[90vh] bg-gray-900 rounded-2xl shadow-2xl border border-gray-700 overflow-hidden">
-            {validationType == "schema" && (
+            {validationType == "data" && (
             <>
               <ModalHeaderData validationResponse={dataValidationResponse} validationType={validationType} closeModal={closeModal} selectedSchema={selectedSchema}/>
               <ModalContentData validationResponse={dataValidationResponse} validationType={validationType} getStatusColor={getStatusColor} /> 
