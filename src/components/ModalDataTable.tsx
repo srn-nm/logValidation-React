@@ -114,169 +114,79 @@ interface Props {
 }
 
 export default function ModalDataTable({ DataValidationResponse, validationType, getStatusColor }: Props) {
-  console.log("ModalDataTable received:", DataValidationResponse);
+  const schemaId = Object.keys(DataValidationResponse)[0];
   
-  if ('id' in DataValidationResponse && 'root' in DataValidationResponse) {
-    const root = DataValidationResponse.root;
-    
-    if (!root || typeof root !== 'object') {
-      return (
-        <div className="bg-gray-800 rounded-xl p-8 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-yellow-500/20 mb-4">
-            <svg className="h-8 w-8 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.342 16.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
-          </div>
-          <h3 className="text-xl font-semibold text-white mb-2">Invalid Data Structure</h3>
-          <p className="text-gray-400">
-            No valid data found in the response.
-          </p>
-        </div>
-      );
-    }
-    
-    const dataItems: DataItem[] = Object.keys(root).map(dataId => ({
-      dataId,
-      non_calc: root[dataId]?.non_calc || []
-    }));
+  const dataObject = DataValidationResponse[schemaId];
+  
+  const dataItems: DataItem[] = Object.keys(dataObject).map(dataId => ({
+    dataId,
+    non_calc: dataObject[dataId]?.non_calc || []
+  }));
 
-    if (dataItems.length === 0) {
-      return (
-        <div className="bg-gray-800 rounded-xl p-8 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-500/20 mb-4">
-            <svg className="h-8 w-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h3 className="text-xl font-semibold text-white mb-2">No Data Issues Found!</h3>
-          <p className="text-gray-400">
-            All data entries have passed validation checks.
-          </p>
-        </div>
-      );
-    }
+  const itemsWithIssues = dataItems.filter(item => item.non_calc.length > 0);
 
+  if (itemsWithIssues.length === 0) {
     return (
-      <div className="bg-gray-800 rounded-xl p-5">
-        <div className="flex justify-between items-center mb-4">
-          <h4 className="font-medium text-gray-400 text-xl">
-            Data Validation Issues ({dataItems.length} data entries)
-          </h4>
-          <span className="text-sm text-gray-500">
-            Click on <KeyboardArrowDownIcon fontSize="small" /> to see details for each data entry
-          </span>
+      <div className="bg-gray-800 rounded-xl p-8 text-center">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-500/20 mb-4">
+          <svg className="h-8 w-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
         </div>
-        
-        <TableContainer 
-          component={Paper} 
-          sx={{ 
-            backgroundColor: '#1f2937',
-            '& .MuiTableCell-root': {
-              color: '#d1d5db',
-              borderColor: '#374151'
-            },
-            '& .MuiTableHead-root .MuiTableCell-root': {
-              color: '#9ca3af',
-              fontWeight: '600'
-            }
-          }}
-        >
-          <Table aria-label="collapsible data table">
-            <TableHead>
-              <TableRow>
-                <TableCell />
-                <TableCell>Data ID</TableCell>
-                <TableCell align="right">Total Issues</TableCell>
-                <TableCell align="right">Warnings</TableCell>
-                <TableCell align="right">Errors</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {dataItems.map((dataItem) => (
-                <DataRow 
-                  key={dataItem.dataId}
-                  dataItem={dataItem}
-                  getStatusColor={getStatusColor}
-                />
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </div>
-    );
-  } else {
-    // This is the old structure
-    const schemaId = Object.keys(DataValidationResponse)[0];
-    const dataObject = DataValidationResponse[schemaId];
-    
-    const dataItems: DataItem[] = Object.keys(dataObject).map(dataId => ({
-      dataId,
-      non_calc: dataObject[dataId].non_calc || []
-    }));
-
-    if (dataItems.length === 0) {
-      return (
-        <div className="bg-gray-800 rounded-xl p-8 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-500/20 mb-4">
-            <svg className="h-8 w-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h3 className="text-xl font-semibold text-white mb-2">No Data Issues Found!</h3>
-          <p className="text-gray-400">
-            All data entries have passed validation checks.
-          </p>
-        </div>
-      );
-    }
-
-    return (
-      <div className="bg-gray-800 rounded-xl p-5">
-        <div className="flex justify-between items-center mb-4">
-          <h4 className="font-medium text-gray-400 text-xl">
-            Data Validation Issues ({dataItems.length} data entries)
-          </h4>
-          <span className="text-sm text-gray-500">
-            Click on <KeyboardArrowDownIcon fontSize="small" /> to see details for each data entry
-          </span>
-        </div>
-        
-        <TableContainer 
-          component={Paper} 
-          sx={{ 
-            backgroundColor: '#1f2937',
-            '& .MuiTableCell-root': {
-              color: '#d1d5db',
-              borderColor: '#374151'
-            },
-            '& .MuiTableHead-root .MuiTableCell-root': {
-              color: '#9ca3af',
-              fontWeight: '600'
-            }
-          }}
-        >
-          <Table aria-label="collapsible data table">
-            <TableHead>
-              <TableRow>
-                <TableCell />
-                <TableCell>Data ID</TableCell>
-                <TableCell align="right">Total Issues</TableCell>
-                <TableCell align="right">Warnings</TableCell>
-                <TableCell align="right">Errors</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {dataItems.map((dataItem) => (
-                <DataRow 
-                  key={dataItem.dataId}
-                  dataItem={dataItem}
-                  getStatusColor={getStatusColor}
-                />
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <h3 className="text-xl font-semibold text-white mb-2">No Data Issues Found!</h3>
+        <p className="text-gray-400">
+          All data entries have passed validation checks.
+        </p>
       </div>
     );
   }
+
+  return (
+    <div className="bg-gray-800 rounded-xl p-5">
+      <div className="flex justify-between items-center mb-4">
+        <h4 className="font-medium text-gray-400 text-xl">
+          Data Validation Issues ({itemsWithIssues.length} data entries with issues)
+        </h4>
+        <span className="text-sm text-gray-500">
+          Click on <KeyboardArrowDownIcon fontSize="small" /> to see details for each data entry
+        </span>
+      </div>
+      
+      <TableContainer 
+        component={Paper} 
+        sx={{ 
+          backgroundColor: '#1f2937',
+          '& .MuiTableCell-root': {
+            color: '#d1d5db',
+            borderColor: '#374151'
+          },
+          '& .MuiTableHead-root .MuiTableCell-root': {
+            color: '#9ca3af',
+            fontWeight: '600'
+          }
+        }}
+      >
+        <Table aria-label="collapsible data table">
+          <TableHead>
+            <TableRow>
+              <TableCell />
+              <TableCell>Data ID</TableCell>
+              <TableCell align="right">Total Issues</TableCell>
+              <TableCell align="right">Warnings</TableCell>
+              <TableCell align="right">Errors</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {itemsWithIssues.map((dataItem) => (
+              <DataRow 
+                key={dataItem.dataId}
+                dataItem={dataItem}
+                getStatusColor={getStatusColor}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </div>
+  );
 }

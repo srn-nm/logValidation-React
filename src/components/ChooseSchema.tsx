@@ -113,17 +113,13 @@ export default function ChooseSchema() {
     }
   };
 
-  const processApiResponseDataCheck = (apiData: any, selectedSchema: any) => {
-    
-    const schemaId = selectedSchema.id.toString();
-            
-    return {
-      id: selectedSchema.id,
-      description: selectedSchema.description,
-      root: apiData[schemaId],
-      schemaId: schemaId
-    };
+  const processApiResponseDataCheck = (apiData: any, selectedSchema: any): DataValidationResponse => {
+  const schemaId = selectedSchema.id.toString();
+  
+  return {
+    [schemaId]: apiData.root
   };
+};
 
   const closeModal = () => {
     setShowModal(false);
