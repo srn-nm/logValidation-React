@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headlessui/react";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
-import HARDCODED_SCHEMA_LIST from "../constants/schemasList"; 
+import HARDCODED_SCHEMA_LIST from "../constants/SchemasList"; 
 import axios from "axios";
 
 export default function ChooseSchema() {
@@ -13,8 +13,10 @@ export default function ChooseSchema() {
   const [validationType, setValidationType] = useState<"schema" | "data" | null>(null);
 
   const handleSchemaValidationBySchemaID = async () => {
-    setValidationData("");
+    setValidationType("schema");
+    setValidationData(null);
     setIsChecking(true);
+    setShowModal(false);
 
     try {
       const res = await axios.get(
@@ -33,74 +35,130 @@ export default function ChooseSchema() {
         }
       );
 
-      console.log("res data: ", res.data);
-      setValidationData(res.data);
+      console.log("API Response data:", res.data);
+      
+      // Process the API response
+      const processedData = processApiResponse(res.data, selectedSchema);
+      setValidationData(processedData);
+      setShowModal(true);
 
     } catch (error) {
-      console.error("Error checking schema:" + error);
+      console.error("Error checking schema:", error);
+      // Show error state
+      setValidationData({
+        id: selectedSchema.id,
+        description: selectedSchema.description,
+        root: [],
+        error: "Failed to fetch validation data"
+      });
+      setShowModal(true);
     } finally {
       setIsChecking(false);
     }
+  };
 
-    setValidationType("schema");
-    setIsChecking(true);
+  // Helper function to process API response
+  const processApiResponse = (apiData: any, selectedSchema: any) => {
+    console.log("Processing API data:", apiData);
     
-    setTimeout(() => {
-      // Get validation data for the selected schema ID
-      const schemaId = selectedSchema.id.toString();
+    const schemaId = selectedSchema.id.toString();
+    
+    // Check if the API response has data for this schema ID
+    if (apiData[schemaId]) {
+      // The data is nested under the schema ID key
+      const schemaData = apiData[schemaId];
       
-      // Cast to any to access dynamic properties
-      
-      console.log("Selected Schema ID:", schemaId);
-      console.log("Data:", validationData);
-      
-      // Check if test data has validation for this specific schema ID
-      if (validationData[schemaId] && validationData[schemaId].root) {
-        // Found validation data for this schema ID
-        console.log("Found validation data for schema", schemaId);
-        setValidationData({
+      // Check if it has a 'non_calc' property (from your console log)
+      if (schemaData.non_calc) {
+        // Convert non_calc array to the expected 'root' format
+        return {
           id: selectedSchema.id,
           description: selectedSchema.description,
-          root: validationData[schemaId].root
-        });
+          root: schemaData.non_calc.map((item: any, index: number) => ({
+            _id: index,
+            field: item.field || `Field ${index}`,
+            type: item.type || "schema",
+            code: item.code || "UNKNOWN",
+            level: item.level || "WARNING",
+            detail: {
+              en: item.message || item.detail?.en || "No details available",
+              fa: item.detail?.fa || ""
+            }
+          }))
+        };
+      } else if (schemaData.root) {
+        // Has root property directly
+        return {
+          id: selectedSchema.id,
+          description: selectedSchema.description,
+          root: schemaData.root
+        };
       } else {
-        // No validation data found for this schema ID
-        // Try to find any validation data in the object
-        console.log("Looking for any validation data...");
+        // Unknown structure, return as is
+        return {
+          id: selectedSchema.id,
+          description: selectedSchema.description,
+          ...schemaData,
+          root: [] // Ensure root exists
+        };
+      }
+    } else {
+      // API response doesn't have data for this schema ID
+      // Try to extract any available data
+      const keys = Object.keys(apiData).filter(key => !isNaN(Number(key)));
+      
+      if (keys.length > 0) {
+        // Use the first available data
+        const firstKey = keys[0];
+        const firstData = apiData[firstKey];
         
-        // Get all keys that are numbers (schema IDs)
-        const schemaKeys = Object.keys(validationData).filter(key => 
-          !isNaN(Number(key)) && validationData[key]?.root
-        );
-        
-        if (schemaKeys.length > 0) {
-          // Use the first available validation data
-          const firstKey = schemaKeys[0];
-          console.log("Using validation data for schema", firstKey);
-          setValidationData({
+        if (firstData.non_calc) {
+          return {
             id: selectedSchema.id,
             description: selectedSchema.description,
-            root: validationData[firstKey].root,
-            note: `Note: Test data shows validation results for schema ${firstKey}`
-          });
-        } else {
-          // No validation data at all
-          console.log("No validation data found");
-          setValidationData({
-            id: selectedSchema.id,
-            description: selectedSchema.description,
-            root: []
-          });
+            root: firstData.non_calc.map((item: any, index: number) => ({
+              _id: index,
+              field: item.field || `Field ${index}`,
+              type: item.type || "schema",
+              code: item.code || "UNKNOWN",
+              level: item.level || "WARNING",
+              detail: {
+                en: item.message || item.detail?.en || "No details available",
+                fa: item.detail?.fa || ""
+              }
+            })),
+            note: `Showing validation data for schema ${firstKey} (requested: ${selectedSchema.id})`
+          };
         }
       }
       
-      setShowModal(true);
-      setIsChecking(false);
-    }, 1000); 
+      // No data found
+      return {
+        id: selectedSchema.id,
+        description: selectedSchema.description,
+        root: [],
+        note: "No validation data available for this schema"
+      };
+    }
   };
 
   const handleDataValidationBySchemaID = async () => {
+    // todo - implement data validation
+    setValidationType("data");
+    setIsChecking(true);
     
+    // For now, just show a placeholder
+    setTimeout(() => {
+      setValidationData({
+        id: selectedSchema.id,
+        description: selectedSchema.description,
+        type: "data_validation",
+        root: [],
+        note: "Data validation not implemented yet"
+      });
+      setShowModal(true);
+      setIsChecking(false);
+    }, 500);
   };
 
   const closeModal = () => {
@@ -220,6 +278,16 @@ export default function ChooseSchema() {
                 <p className="text-gray-400 mt-1">
                   Schema: {validationData.id} - {validationData.description}
                 </p>
+                {validationData.note && (
+                  <p className="text-yellow-400 text-sm mt-1 bg-yellow-500/10 p-2 rounded">
+                    ⚠️ {validationData.note}
+                  </p>
+                )}
+                {validationData.error && (
+                  <p className="text-red-400 text-sm mt-1 bg-red-500/10 p-2 rounded">
+                    ❌ {validationData.error}
+                  </p>
+                )}
                 <div className="flex items-center gap-2 mt-2">
                   <span className={`px-2 py-1 text-xs rounded-full ${validationData.root?.length > 0 ? 'bg-yellow-500/20 text-yellow-300' : 'bg-green-500/20 text-green-300'}`}>
                     {validationData.root?.length > 0 ? `${validationData.root.length} Issues Found` : 'No Issues Found'}
@@ -305,23 +373,23 @@ export default function ChooseSchema() {
                                   {index + 1}
                                 </td>
                                 <td className="px-4 py-3 text-blue-400 font-mono">
-                                  {error.field}
+                                  {error.field || `Error ${index + 1}`}
                                 </td>
                                 <td className="px-4 py-3 text-gray-300">
-                                  {error.type}
+                                  {error.type || "schema"}
                                 </td>
                                 <td className="px-4 py-3 font-mono">
                                   <span className="px-2 py-1 text-xs bg-purple-500/20 text-purple-300 rounded-full">
-                                    {error.code}
+                                    {error.code || "UNKNOWN"}
                                   </span>
                                 </td>
                                 <td className="px-4 py-3">
                                   <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(error.level)}`}>
-                                    {error.level}
+                                    {error.level || "WARNING"}
                                   </span>
                                 </td>
                                 <td className="px-4 py-3 text-gray-300">
-                                  {error.detail?.en || error.detail || "No details available"}
+                                  {error.detail?.en || error.detail || error.message || "No details available"}
                                 </td>
                               </tr>
                             ))}
@@ -338,6 +406,11 @@ export default function ChooseSchema() {
                       <p className="text-gray-400">
                         The {validationType === "schema" ? "schema" : "data"} has passed all validation checks.
                       </p>
+                      {validationData.note && (
+                        <p className="text-gray-500 mt-2 text-sm">
+                          {validationData.note}
+                        </p>
+                      )}
                     </div>
                   )}
 
@@ -359,74 +432,3 @@ export default function ChooseSchema() {
     </div>
   );
 }
-
-
-// [vite] connecting...
-// client:745  WebSocket connection to 'ws://172.16.20.98:5174/?token=whpySc3w4Cc0' failed: 
-// createConnection @ client:745
-// connect @ client:411
-// connect @ client:751
-// connect @ client:289
-// connect @ client:373
-// (anonymous) @ client:823
-// client:772  [vite] failed to connect to websocket (Error: WebSocket closed without opened.). 
-// overrideMethod @ hook.js:608
-// connect @ client:772
-// await in connect
-// connect @ client:289
-// connect @ client:373
-// (anonymous) @ client:823
-// client:423  Uncaught (in promise) Error: WebSocket closed without opened.
-//     at WebSocket.<anonymous> (client:423:30)
-// (anonymous) @ client:423
-// scheduler.development.js:14 [Violation] 'message' handler took 408ms
-// ChooseSchema.tsx:36 res data:  {27: {…}}27: 112666: {non_calc: Array(2)}112667: {non_calc: Array(2)}112668: {non_calc: Array(2)}112669: {non_calc: Array(1)}112670: {non_calc: Array(1)}112671: {non_calc: Array(1)}112672: {non_calc: Array(1)}112673: {non_calc: Array(2)}112674: {non_calc: Array(1)}112675: {non_calc: Array(1)}112676: {non_calc: Array(1)}112677: {non_calc: Array(1)}112678: {non_calc: Array(1)}112679: {non_calc: Array(1)}112680: {non_calc: Array(2)}112681: {non_calc: Array(1)}112682: {non_calc: Array(1)}112683: {non_calc: Array(1)}112684: {non_calc: Array(1)}112685: {non_calc: Array(2)}112686: {non_calc: Array(2)}112687: {non_calc: Array(2)}112688: {non_calc: Array(2)}112689: {non_calc: Array(2)}112690: {non_calc: Array(2)}112691: {non_calc: Array(2)}112692: {non_calc: Array(2)}112693: {non_calc: Array(2)}112694: {non_calc: Array(2)}112695: {non_calc: Array(2)}112696: {non_calc: Array(2)}112697: {non_calc: Array(2)}112698: {non_calc: Array(2)}112699: {non_calc: Array(2)}112700: {non_calc: Array(1)}112701: {non_calc: Array(2)}112702: {non_calc: Array(1)}112703: {non_calc: Array(2)}112704: {non_calc: Array(2)}112705: {non_calc: Array(1)}112706: {non_calc: Array(2)}112707: {non_calc: Array(2)}112708: {non_calc: Array(2)}112709: {non_calc: Array(2)}112710: {non_calc: Array(1)}112711: {non_calc: Array(1)}112712: {non_calc: Array(2)}112713: {non_calc: Array(2)}112714: {non_calc: Array(1)}112715: {non_calc: Array(1)}112716: {non_calc: Array(2)}112717: {non_calc: Array(1)}112718: {non_calc: Array(2)}112719: {non_calc: Array(2)}112720: {non_calc: Array(1)}112721: {non_calc: Array(1)}112722: {non_calc: Array(2)}112723: {non_calc: Array(2)}112724: {non_calc: Array(2)}112798: {non_calc: Array(2)}112799: {non_calc: Array(2)}112800: {non_calc: Array(1)}112801: {non_calc: Array(1)}112802: {non_calc: Array(2)}112803: {non_calc: Array(2)}112804: {non_calc: Array(1)}112805: {non_calc: Array(1)}112810: {non_calc: Array(2)}112817: {non_calc: Array(1)}112822: {non_calc: Array(2)}112823: {non_calc: Array(2)}112824: {non_calc: Array(2)}112825: {non_calc: Array(2)}112826: {non_calc: Array(2)}112827: {non_calc: Array(2)}112828: {non_calc: Array(2)}112829: {non_calc: Array(2)}112830: {non_calc: Array(2)}112831: {non_calc: Array(2)}112832: {non_calc: Array(2)}112833: {non_calc: Array(2)}112834: {non_calc: Array(2)}112835: {non_calc: Array(2)}112846: {non_calc: Array(2)}112847: {non_calc: Array(2)}112848: {non_calc: Array(2)}112850: {non_calc: Array(2)}112851: {non_calc: Array(2)}112852: {non_calc: Array(2)}112853: {non_calc: Array(1)}112854: {non_calc: Array(2)}112855: {non_calc: Array(2)}112856: {non_calc: Array(2)}112857: {non_calc: Array(1)}112858: {non_calc: Array(2)}112859: {non_calc: Array(1)}112860: {non_calc: Array(1)}112861: {non_calc: Array(1)}112862: {non_calc: Array(2)}112863: {non_calc: Array(1)}112864: {non_calc: Array(1)}112868: {non_calc: Array(1)}112869: {non_calc: Array(1)}112870: {non_calc: Array(1)}112871: {non_calc: Array(1)}112872: {non_calc: Array(2)}112873: {non_calc: Array(2)}112878: {non_calc: Array(1)}112880: {non_calc: Array(2)}112881: {non_calc: Array(2)}112882: {non_calc: Array(2)}112883: {non_calc: Array(2)}112884: {non_calc: Array(2)}112885: {non_calc: Array(2)}112888: {non_calc: Array(1)}112889: {non_calc: Array(1)}112890: {non_calc: Array(1)}112891: {non_calc: Array(2)}112892: {non_calc: Array(2)}112893: {non_calc: Array(1)}112897: {non_calc: Array(1)}112901: {non_calc: Array(1)}112906: {non_calc: Array(2)}112907: {non_calc: Array(2)}112908: {non_calc: Array(1)}112909: {non_calc: Array(2)}112910: {non_calc: Array(1)}112911: {non_calc: Array(1)}112912: {non_calc: Array(2)}112913: {non_calc: Array(1)}112914: {non_calc: Array(2)}112915: {non_calc: Array(1)}112916: {non_calc: Array(2)}112917: {non_calc: Array(2)}112918: {non_calc: Array(1)}112919: {non_calc: Array(2)}112920: {non_calc: Array(2)}112921: {non_calc: Array(2)}112924: {non_calc: Array(2)}112925: {non_calc: Array(2)}112927: {non_calc: Array(2)}112928: {non_calc: Array(2)}112929: {non_calc: Array(2)}112930: {non_calc: Array(2)}112931: {non_calc: Array(2)}112932: {non_calc: Array(2)}112933: {non_calc: Array(2)}112934: {non_calc: Array(2)}112935: {non_calc: Array(2)}112936: {non_calc: Array(2)}112937: {non_calc: Array(2)}112938: {non_calc: Array(2)}112939: {non_calc: Array(2)}112940: {non_calc: Array(2)}112941: {non_calc: Array(2)}112942: {non_calc: Array(2)}112943: {non_calc: Array(2)}112944: {non_calc: Array(2)}112945: {non_calc: Array(2)}112946: {non_calc: Array(2)}112947: {non_calc: Array(2)}112948: {non_calc: Array(2)}112949: {non_calc: Array(2)}112950: {non_calc: Array(2)}112951: {non_calc: Array(2)}112952: {non_calc: Array(2)}112953: {non_calc: Array(2)}112954: {non_calc: Array(2)}112955: {non_calc: Array(2)}112956: {non_calc: Array(2)}112958: {non_calc: Array(2)}112959: {non_calc: Array(2)}112960: {non_calc: Array(2)}112961: {non_calc: Array(2)}112962: {non_calc: Array(1)}112963: {non_calc: Array(2)}112964: {non_calc: Array(2)}112965: {non_calc: Array(2)}112966: {non_calc: Array(2)}112968: {non_calc: Array(2)}112969: {non_calc: Array(2)}112970: {non_calc: Array(2)}112971: {non_calc: Array(2)}112972: {non_calc: Array(2)}112973: {non_calc: Array(2)}112974: {non_calc: Array(2)}112976: {non_calc: Array(2)}112977: {non_calc: Array(2)}112978: {non_calc: Array(1)}112980: {non_calc: Array(1)}112981: {non_calc: Array(2)}112982: {non_calc: Array(2)}112983: {non_calc: Array(1)}112985: {non_calc: Array(1)}112986: {non_calc: Array(1)}112987: {non_calc: Array(1)}112988: {non_calc: Array(2)}112989: {non_calc: Array(1)}112990: {non_calc: Array(2)}112991: {non_calc: Array(2)}112992: {non_calc: Array(2)}112993: {non_calc: Array(1)}112994: {non_calc: Array(1)}112996: {non_calc: Array(1)}112997: {non_calc: Array(2)}112998: {non_calc: Array(2)}113000: {non_calc: Array(2)}113001: {non_calc: Array(2)}113002: {non_calc: Array(2)}113004: {non_calc: Array(1)}113016: {non_calc: Array(1)}113039: {non_calc: Array(2)}113041: {non_calc: Array(2)}113043: {non_calc: Array(2)}113045: {non_calc: Array(2)}113055: {non_calc: Array(1)}113056: {non_calc: Array(1)}[[Prototype]]: Object(...)[[Prototype]]: Object
-// ChooseSchema.tsx:54 Selected Schema ID: 27
-// ChooseSchema.tsx:55 Data: null
-// ChooseSchema.tsx:58  Uncaught TypeError: Cannot read properties of null (reading '27')
-//     at ChooseSchema.tsx:58:11
-// (anonymous) @ ChooseSchema.tsx:58
-// setTimeout
-// handleSchemaValidationBySchemaID @ ChooseSchema.tsx:48
-// await in handleSchemaValidationBySchemaID
-// executeDispatch @ react-dom-client.development.js:19116
-// runWithFiberInDEV @ react-dom-client.development.js:871
-// processDispatchQueue @ react-dom-client.development.js:19166
-// (anonymous) @ react-dom-client.development.js:19767
-// batchedUpdates$1 @ react-dom-client.development.js:3255
-// dispatchEventForPluginEventSystem @ react-dom-client.development.js:19320
-// dispatchEvent @ react-dom-client.development.js:23585
-// dispatchDiscreteEvent @ react-dom-client.development.js:23553
-// <button>
-// exports.jsxDEV @ react-jsx-dev-runtime.development.js:335
-// ChooseSchema @ ChooseSchema.tsx:183
-// react_stack_bottom_frame @ react-dom-client.development.js:25904
-// renderWithHooksAgain @ react-dom-client.development.js:7762
-// renderWithHooks @ react-dom-client.development.js:7674
-// updateFunctionComponent @ react-dom-client.development.js:10166
-// beginWork @ react-dom-client.development.js:11778
-// runWithFiberInDEV @ react-dom-client.development.js:871
-// performUnitOfWork @ react-dom-client.development.js:17641
-// workLoopSync @ react-dom-client.development.js:17469
-// renderRootSync @ react-dom-client.development.js:17450
-// performWorkOnRoot @ react-dom-client.development.js:16504
-// performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:18957
-// performWorkUntilDeadline @ scheduler.development.js:45
-// <ChooseSchema>
-// exports.jsxDEV @ react-jsx-dev-runtime.development.js:335
-// SchemaValidation @ SchemaValidation.tsx:7
-// react_stack_bottom_frame @ react-dom-client.development.js:25904
-// renderWithHooksAgain @ react-dom-client.development.js:7762
-// renderWithHooks @ react-dom-client.development.js:7674
-// updateFunctionComponent @ react-dom-client.development.js:10166
-// beginWork @ react-dom-client.development.js:11778
-// runWithFiberInDEV @ react-dom-client.development.js:871
-// performUnitOfWork @ react-dom-client.development.js:17641
-// workLoopSync @ react-dom-client.development.js:17469
-// renderRootSync @ react-dom-client.development.js:17450
-// performWorkOnRoot @ react-dom-client.development.js:16504
-// performWorkOnRootViaSchedulerTask @ react-dom-client.development.js:18957
-// performWorkUntilDeadline @ scheduler.development.js:45
-// <SchemaValidation>
-// exports.jsxDEV @ react-jsx-dev-runtime.development.js:335
-// (anonymous) @ Router.tsx:37
