@@ -7,5 +7,5 @@ export default function SchemaValidation() {
                 <ChooseSchema />
             </div>
         </div>
-    );
-}
+    )
+};

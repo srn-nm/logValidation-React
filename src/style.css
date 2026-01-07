@@ -2,21 +2,22 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @theme {
   --breakpoint-xs: 30rem;
   --breakpoint-2xs: 20rem;
 }
 
-@font-face {
+/* @font-face {
   font-family: 'Vazirmatn';
   src: url('/fonts/Vazirmatn-Regular.woff2') format('woff2'),
        url('/fonts/Vazirmatn-Regular.ttf') format('ttf');
 }
 
 body, input, button, textarea, select {
-  font-family: 'Vazirmatn';
-}
+  font-family: 'Vazirmatn', sans-serif;
+} */
 
 @layer utilities {
   .scrollbar-dark {

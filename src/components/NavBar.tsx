@@ -1,6 +1,6 @@
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import ProfileDropDown from './ProfileDropDown'
+import ProfileDropDown from './ProfileDropdown'
 import LeaderboardIcon from '@mui/icons-material/Leaderboard';
 import { useNavigate, useLocation } from 'react-router-dom';
 

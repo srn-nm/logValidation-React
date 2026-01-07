@@ -2,17 +2,8 @@ import { useState } from "react";
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headlessui/react";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
+import HARDCODED_SCHEMA_LIST from "../constants/schemasList"; 
 
-const HARDCODED_SCHEMA_IDS = [
-  { id: "160", name: "Schema 160" },
-  { id: "165", name: "Schema 165" },
-  { id: "170", name: "Schema 170" },
-  { id: "175", name: "Schema 175" },
-  { id: "180", name: "Schema 180" },
-  { id: "185", name: "Schema 185" },
-  { id: "190", name: "Schema 190" },
-  { id: "195", name: "Schema 195" },
-];
 
 const TEST_DATA = {
   id: "test-schema-001",
@@ -60,20 +51,59 @@ const TEST_DATA = {
     },
     invalid: {
       id: "user-456",
-      username: "ab", // Too short
+      username: "ab", 
       email: "invalid-email",
-      age: 15 // Under 18
+      age: 15 
     }
   }
 };
 
 export default function ChooseSchema() {
-  const [selectedSchema, setSelectedSchema] = useState(HARDCODED_SCHEMA_IDS[0]);
+  const [selectedSchema, setSelectedSchema] = useState(HARDCODED_SCHEMA_LIST[0]);
   const [isChecking, setIsChecking] = useState(false);
   const [data, setData] = useState<any | null>(null);
   const [showModal, setShowModal] = useState(false);
 
-  const handleCheckSchema = async () => {
+  const handleSchemaValidationBySchemaID = async () => {
+
+    // setData("");
+    // setIsChecking(true);
+
+    // try {
+    //   const res = await axios.get(
+    //     `http://172.16.20.134:8080/api/v1/data/validation/schema/${selectedSchema.id}`,
+    //     {
+    //       params: {
+    //         calc_validation: false,
+    //         deep_check: false,
+    //         max_depth: 1,
+    //         lang: "en",
+    //       },
+    //       headers: {
+    //         Accept: `application/json`,
+    //         Authorization: `Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ZWVkYTJlNi00M2EwLTQ4ZDUtOGRiMi1hYWRlMjExYjQ0ZWIiLCJleHAiOjE3NjgyMjM1MzgsImlhdCI6MTc2NzYxODczOCwibmJmIjoxNzY3NjE4NzM4LCJqdGkiOiJmN2Q2MDlmYS02YTIyLTRjMmMtOGFlNS1jNDA2YWU3NzI3YjMiLCJyb2xlcyI6WyJ1c2VyIl0sInNjb3BlcyI6WyJyZXBvcnQ6cmVhZCIsInJlcG9ydDp3cml0ZSIsInRlbXBsYXRlOnJlYWQiLCJ0ZW1wbGF0ZTp3cml0ZSJdfQ.Vt72jELV2tyYvIBTV2LsJMs-Y2c_m_jJhWpoE48JIMLOFifL5Cf9VFcPMAEYuV6SZNoqOua1QVHL8036XniifxJBy5QHVFQZIw9FUrJaF0BdOB4vbkJO4n33cZ8yzziVqKQAjtuACb7_ihf5rbfhDUywJYRx789w6f1Z85DXJbsUXihDngZSBpgIm-d-W-9B04AomX0O6b_Wjp44xmHOsQPx8Yqo9lbIjAz13SV-1mrxPwWEzbMiQz3vwjtrEpL95YAxiWzXmcFIDhTRHs6MhEyWZP1cJKYfN390ECIOX7BMfEZ6aDSiU3fQ_slmRs-xXjac1CSrBiXuQLPgaPsUEg`,
+    //       }
+    //     }
+    //   );
+
+    //   setData(res.data);
+
+    // } catch (error) {
+    //   console.error("Error checking schema:" + error);
+    // } finally {
+    //   setIsChecking(false);
+    // }
+
+    setIsChecking(true);
+    
+    setTimeout(() => {
+      setData(TEST_DATA); 
+      setShowModal(true);
+      setIsChecking(false);
+    }, 1000); 
+  };
+
+  const handleDataValidationBySchemaID = async () => {
 
     // setData("");
     // setIsChecking(true);
@@ -136,11 +166,11 @@ export default function ChooseSchema() {
               <Listbox value={selectedSchema} onChange={setSelectedSchema}>
                 <div className="relative mt-1">
                   <ListboxButton className="relative w-full rounded-lg bg-white/5 py-2 pl-3 pr-10 text-left text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <span className="block truncate">{selectedSchema.name}</span>
+                    <span className="block truncate">{selectedSchema.description}</span>
                   </ListboxButton>
                   
                   <ListboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-gray-800 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                    {HARDCODED_SCHEMA_IDS.map((schema) => (
+                    {HARDCODED_SCHEMA_LIST.map((schema) => (
                       <ListboxOption
                         key={schema.id}
                         className={({ active }) =>
@@ -159,7 +189,7 @@ export default function ChooseSchema() {
                                 'block truncate'
                               )}
                             >
-                              {schema.name}
+                              {schema.description}
                             </span>
                             {selected ? (
                               <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-500">
@@ -181,7 +211,7 @@ export default function ChooseSchema() {
                     hover:bg-blue-600 dark:hover:bg-blue-700 
                     active:scale-95 active:bg-blue-700 dark:active:bg-blue-800 
                     transition-all duration-150 ease-in-out"
-                onClick={handleCheckSchema}
+                onClick={handleSchemaValidationBySchemaID}
                 disabled={isChecking}
               >
               Check Schema
@@ -192,13 +222,11 @@ export default function ChooseSchema() {
                     hover:bg-blue-600 dark:hover:bg-blue-700 
                     active:scale-95 active:bg-blue-700 dark:active:bg-blue-800 
                     transition-all duration-150 ease-in-out"
-                onClick={handleCheckSchema}
+                onClick={handleDataValidationBySchemaID}
                 disabled={isChecking}
               >
               Check Data
               </button>
-              
-              
             </div>
           </>
         }
@@ -216,7 +244,7 @@ export default function ChooseSchema() {
                     Schema Results
                 </h2>
                 <p className="text-gray-400 mt-1">
-                  Selected: {selectedSchema.id} - {selectedSchema.name}
+                  Selected: {selectedSchema.id} - {selectedSchema.description}
                 </p>
               </div>
               
@@ -269,34 +297,38 @@ export default function ChooseSchema() {
                       <table className="min-w-full divide-y divide-gray-700">
                         <thead>
                           <tr>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Property</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Type</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Required</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Description</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Field</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Code</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Level</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Detail</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-700">
-                          {Object.entries(data.properties).map(([key, value]: [string, any]) => (
-                            <tr key={key} className="hover:bg-gray-700/50">
-                              <td className="px-4 py-3">
-                                <span className="text-blue-400 font-mono font-medium">{key}</span>
-                              </td>
-                              <td className="px-4 py-3">
-                                <span className="text-green-400 font-medium">{value.type}</span>
-                              </td>
-                              <td className="px-4 py-3">
-                                {value.required ? (
-                                  <span className="px-2 py-1 text-xs bg-red-500/20 text-red-300 rounded-full">Required</span>
-                                ) : (
-                                  <span className="px-2 py-1 text-xs bg-gray-700 text-gray-300 rounded-full">Optional</span>
-                                )}
-                              </td>
-                              <td className="px-4 py-3 text-gray-300">
-                                {value.description || "No description"}
-                              </td>
+                        {Object.entries(data).map(([id, item]) =>
+                            item.root.map((error: any) => (
+                            <tr className="hover:bg-gray-700/50">
+                                <td className="px-4 py-3 text-blue-400 font-mono">
+                                {error.field}
+                                </td>
+
+                                <td className="px-4 py-3 text-green-400">
+                                {error.code}
+                                </td>
+
+                                <td className="px-4 py-3">
+                                <span className="px-2 py-1 text-xs bg-yellow-500/20 text-yellow-300 rounded-full">
+                                    {error.level}
+                                </span>
+                                </td>
+
+                                <td className="px-4 py-3 text-gray-300">
+                                {error.detail?.en}
+                                </td>
                             </tr>
-                          ))}
+                            ))
+                        )}
                         </tbody>
+
                       </table>
                     </div>
                   </div>
@@ -342,8 +374,6 @@ export default function ChooseSchema() {
                   </div>
                 </div>
             </div>
-
-            
           </div>
         </div>
       )}
