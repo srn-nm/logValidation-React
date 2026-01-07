@@ -1,21 +1,21 @@
 import { CheckIcon } from "@heroicons/react/20/solid";
-import type SchemaValidationResponse from "../types/schemaValidationResponse"
+import type SchemaValidationResponse from "../types/SchemaValidationResponse"
 
 
 interface Props {
-  validationData: SchemaValidationResponse;
+  SchemaValidationResponse: SchemaValidationResponse;
   validationType: "schema" | "data" | null;
   getStatusColor: (level: string) => {}
 }
 
 
-export default function ModalSchemaTable ({validationData, validationType, getStatusColor}: Props) {
+export default function ModalSchemaTable ({SchemaValidationResponse, validationType, getStatusColor}: Props) {
     return (
         <>
-            {validationData.root && validationData.root.length > 0 ? (
+            {SchemaValidationResponse.root && SchemaValidationResponse.root.length > 0 ? (
                     <div className="bg-gray-800 rounded-xl p-5">
                       <h4 className="font-medium text-gray-400 mb-4 text-xl">
-                        Validation Issues ({validationData.root.length})
+                        Validation Issues ({SchemaValidationResponse.root.length})
                       </h4>
                       <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-700">
@@ -30,7 +30,7 @@ export default function ModalSchemaTable ({validationData, validationType, getSt
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-gray-700">
-                            {validationData.root.map((error: any, index: number) => (
+                            {SchemaValidationResponse.root.map((error: any, index: number) => (
                               <tr key={index} className="hover:bg-gray-700/50 transition-colors">
                                 <td className="px-4 py-3 text-gray-400 font-mono">
                                   {index + 1}
@@ -69,9 +69,9 @@ export default function ModalSchemaTable ({validationData, validationType, getSt
                       <p className="text-gray-400">
                         The {validationType === "schema" ? "schema" : "data"} has passed all validation checks.
                       </p>
-                      {validationData.note && (
+                      {SchemaValidationResponse.note && (
                         <p className="text-gray-500 mt-2 text-sm">
-                          {validationData.note}
+                          {SchemaValidationResponse.note}
                         </p>
                       )}
                     </div>

@@ -4,19 +4,23 @@ import { CheckIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
 import HARDCODED_SCHEMA_LIST from "../constants/SchemasList"; 
 import axios from "axios";
-import ModalHeader from "./ModalHeader";
-import ModalContent from "./ModalContent";
+import ModalHeaderSchema from "./ModalHeaderSchema";
+import ModalContentSchema from "./ModalContentSchema";
+import type SchemaValidationResponse from "../types/SchemaValidationResponse";
+import type DataValidationResponse from "../types/DataValidationResponse";
+import ModalHeaderData from "./ModalHeaderData";
 
 export default function ChooseSchema() {
   const [selectedSchema, setSelectedSchema] = useState(HARDCODED_SCHEMA_LIST[0]);
   const [isChecking, setIsChecking] = useState(false);
-  const [validationResponse, setValidationResponse] = useState<any | null>(null);
+  const [schemaValidationResponse, setSchemaValidationResponse] = useState< SchemaValidationResponse | null>(null);
+  const [dataValidationResponse, setDataValidationResponse] = useState< DataValidationResponse | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [validationType, setValidationType] = useState<"schema" | "data" | null>(null);
 
   const handleSchemaValidationBySchemaID = async () => {
     setValidationType("schema");
-    setValidationResponse(null);
+    setSchemaValidationResponse(null);
     setIsChecking(true);
     setShowModal(false);
 
@@ -38,13 +42,13 @@ export default function ChooseSchema() {
       );
       
       const processedData = processApiResponseSchemaCheck(res.data, selectedSchema);
-      setValidationResponse(processedData);
+      setSchemaValidationResponse(processedData);
       setShowModal(true);
 
     } catch (error) {
       console.error("Error checking schema:", error);
-      setValidationResponse({
-        id: selectedSchema.id,
+      setSchemaValidationResponse({
+        id: selectedSchema.id.toString(),
         description: selectedSchema.description,
         root: [],
         error: "Failed to fetch validation data"
@@ -70,7 +74,7 @@ export default function ChooseSchema() {
 
   const handleDataValidationBySchemaID = async () => {
     setValidationType("data");
-    setValidationResponse(null);
+    setDataValidationResponse(null);
     setIsChecking(true);
     setShowModal(false);
 
@@ -92,16 +96,16 @@ export default function ChooseSchema() {
       );
       
       const processedData = processApiResponseDataCheck(res.data, selectedSchema);
-      setValidationResponse(processedData);
+      setDataValidationResponse(processedData);
       setShowModal(true);
 
     } catch (error) {
-      setValidationResponse({
-        id: selectedSchema.id,
-        description: selectedSchema.description,
-        root: [],
-        error: "Failed to fetch validation data"
-      });
+      // setDataValidationResponse({
+      //   id: selectedSchema.id.toString(),
+      //   description: selectedSchema.description,
+      //   root: [],
+      //   error: "Failed to fetch validation data"
+      // });
       setShowModal(true);
     } finally {
       setIsChecking(false);
@@ -122,7 +126,7 @@ export default function ChooseSchema() {
 
   const closeModal = () => {
     setShowModal(false);
-    setValidationResponse(null);
+    setDataValidationResponse(null);
     setValidationType(null);
   };
 
@@ -223,13 +227,27 @@ export default function ChooseSchema() {
         }
       </div>
 
-      {showModal && validationResponse && (
+      {showModal && schemaValidationResponse && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
           <div className="relative w-full max-w-6xl max-h-[90vh] bg-gray-900 rounded-2xl shadow-2xl border border-gray-700 overflow-hidden">
-            
-            <ModalHeader validationData={validationResponse} validationType={validationType} closeModal={closeModal}/>
-            <ModalContent validationData={validationResponse} validationType={validationType} getStatusColor={getStatusColor}/>
-          
+            {validationType == "schema" && (
+            <>
+              <ModalHeaderSchema validationResponse={schemaValidationResponse} validationType={validationType} closeModal={closeModal}/>
+              <ModalContentSchema validationResponse={schemaValidationResponse} validationType={validationType} getStatusColor={getStatusColor}/> 
+            </>
+            )}
+          </div>
+        </div>
+      )}
+      {showModal && dataValidationResponse && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div className="relative w-full max-w-6xl max-h-[90vh] bg-gray-900 rounded-2xl shadow-2xl border border-gray-700 overflow-hidden">
+            {validationType == "schema" && (
+            <>
+              <ModalHeaderData validationResponse={dataValidationResponse} validationType={validationType} closeModal={closeModal} selectedSchema={selectedSchema}/>
+              {/* <ModalContentData validationResponse={dataValidationResponse} validationType={validationType} getStatusColor={getStatusColor} />  */}
+            </>
+            )}
           </div>
         </div>
       )}

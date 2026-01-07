@@ -1,10 +1,9 @@
-import type SchemaValidationResponse from "../types/schemaValidationResponse"
+import type SchemaValidationResponse from "../types/SchemaValidationResponse"
 
 interface Props {
-  validationData: SchemaValidationResponse;
+  validationData: SchemaValidationResponse ;
   validationType: "schema" | "data" | null;
 }
-
 
 export default function ModalSummaryCards ({validationData, validationType}: Props) {
     const issueCount = validationData.root?.length ?? 0;

@@ -1,14 +1,14 @@
 import { XMarkIcon } from "@heroicons/react/20/solid";
-import type SchemaValidationResponse from "../types/schemaValidationResponse"
+import type SchemaValidationResponse from "../types/SchemaValidationResponse"
 
 interface Props {
-  validationData: SchemaValidationResponse;
+  validationResponse: SchemaValidationResponse ;
   validationType: "schema" | "data" | null;
   closeModal: () => void;
 }
 
-export default function ModalHeader ({validationData, validationType, closeModal}: Props) {
-    const issueCount = validationData.root?.length ?? 0;
+export default function ModalHeaderSchema ({validationResponse, validationType, closeModal}: Props) {
+    const issueCount = validationResponse.root?.length ?? 0;
     return(
         <>
             <div className="flex items-center justify-between p-6 border-b border-gray-700 bg-gray-800">
@@ -17,16 +17,16 @@ export default function ModalHeader ({validationData, validationType, closeModal
                   {validationType === "schema" ? "Schema Validation Results" : "Data Validation Results"}
                 </h2>
                 <p className="text-gray-400 mt-1">
-                  Schema ID: {validationData.id} - {validationData.description}
+                  Schema ID: {validationResponse.id} - {validationResponse.description}
                 </p>
-                {validationData.note && (
+                {validationResponse.note && (
                   <p className="text-yellow-400 text-sm mt-1 bg-yellow-500/10 p-2 rounded">
-                     {validationData.note}
+                     {validationResponse.note}
                   </p>
                 )}
-                {validationData.error && (
+                {validationResponse.error && (
                   <p className="text-red-400 text-sm mt-1 bg-red-500/10 p-2 rounded">
-                     {validationData.error}
+                     {validationResponse.error}
                   </p>
                 )}
                 <div className="flex items-center gap-2 mt-2">
@@ -38,9 +38,9 @@ export default function ModalHeader ({validationData, validationType, closeModal
                       Data Validation
                     </span>
                   )}
-                  {validationData.type && (
+                  {validationResponse.type && (
                     <span className="px-2 py-1 text-xs bg-blue-500/20 text-blue-300 rounded-full">
-                      {validationData.type}
+                      {validationResponse.type}
                     </span>
                   )}
                 </div>
