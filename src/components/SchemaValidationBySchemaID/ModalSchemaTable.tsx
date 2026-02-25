@@ -1,15 +1,20 @@
 import { CheckIcon } from "@heroicons/react/20/solid";
-import type SchemaValidationResponse from "../types/schemaValidationResponse"
+import type SchemaValidationResponse from "../../types/SchemaValidationResponseType"
 
 
-interface Props {
-  SchemaValidationResponse: SchemaValidationResponse;
-  validationType: "schema" | "data" | null;
-  getStatusColor: (level: string) => {}
-}
+export default function ModalSchemaTable ({SchemaValidationResponse}: {SchemaValidationResponse: SchemaValidationResponse}) {
 
-
-export default function ModalSchemaTable ({SchemaValidationResponse, validationType, getStatusColor}: Props) {
+  const getStatusColor = (level: string) => {
+    switch (level?.toUpperCase()) {
+      case "ERROR":
+        return "bg-red-500/20 text-red-300";
+      case "WARNING":
+        return "bg-yellow-500/20 text-yellow-300";
+      default:
+        return "bg-gray-500/20 text-gray-300";
+    }
+  };
+    
     return (
         <>
             {SchemaValidationResponse.root && SchemaValidationResponse.root.length > 0 ? (
@@ -22,8 +27,6 @@ export default function ModalSchemaTable ({SchemaValidationResponse, validationT
                           <thead>
                             <tr>
                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">#</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Field</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Type</th>
                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Code</th>
                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Level</th>
                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Detail</th>
@@ -34,12 +37,6 @@ export default function ModalSchemaTable ({SchemaValidationResponse, validationT
                               <tr key={index} className="hover:bg-gray-700/50 transition-colors">
                                 <td className="px-4 py-3 text-gray-400 font-mono">
                                   {index + 1}
-                                </td>
-                                <td className="px-4 py-3 text-blue-400 font-mono">
-                                  {error.field}
-                                </td>
-                                <td className="px-4 py-3 text-gray-300">
-                                  {error.type}
                                 </td>
                                 <td className="px-4 py-3 font-mono">
                                   <span className="px-2 py-1 text-xs bg-purple-500/20 text-purple-300 rounded-full">
@@ -67,7 +64,7 @@ export default function ModalSchemaTable ({SchemaValidationResponse, validationT
                       </div>
                       <h3 className="text-xl font-semibold text-white mb-2">No Issues Found!</h3>
                       <p className="text-gray-400">
-                        The {validationType === "schema" ? "schema" : "data"} has passed all validation checks.
+                        The schema has passed all validation checks.
                       </p>
                       {SchemaValidationResponse.note && (
                         <p className="text-gray-500 mt-2 text-sm">

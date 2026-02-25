@@ -1,24 +1,18 @@
 import ModalSchemaTable from "./ModalSchemaTable";
 import ModalSummaryCards from "./ModalSummaryCardsSchema";
-import type SchemaValidationResponse from "../types/SchemaValidationResponse"
+import type SchemaValidationResponse from "../../types/SchemaValidationResponseType"
 
-interface Props {
-  validationResponse: SchemaValidationResponse;
-  validationType: "schema" | "data" | null;
-  getStatusColor: (level: string) => string
-}
+export default function ModalContentSchema ({validationResponse}: {validationResponse: SchemaValidationResponse}) {
 
-
-export default function ModalContentSchema ({validationResponse, validationType, getStatusColor}: Props) {
     return (
         <>
-             <div className="p-6 overflow-auto max-h-[calc(90vh-120px)]">
+             <div className="p-6 overflow-auto w-full ">
                 <div className="space-y-6">
 
-                  <ModalSummaryCards validationData={validationResponse} validationType={validationType}/>
+                  <ModalSummaryCards validationData={validationResponse} />
 
                   {/* table */}
-                  <ModalSchemaTable SchemaValidationResponse={validationResponse} validationType={validationType} getStatusColor={getStatusColor}/>
+                  <ModalSchemaTable SchemaValidationResponse={validationResponse}/>
                  
                   {/* RAW JSON */}
                   <div className="bg-gray-800 rounded-xl p-5">

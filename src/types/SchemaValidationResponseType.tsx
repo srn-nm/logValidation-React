@@ -1,4 +1,4 @@
-export default interface SchemaValidationData {
+export default interface SchemaValidationResponseType {
   id: string;
   description?: string;
   note?: string;

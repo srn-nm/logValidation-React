@@ -19,22 +19,6 @@ export default function ProfileDropDown() {
                 href="#"
                 className="block px-4 py-2 text-sm text-gray-300 data-focus:bg-white/5 data-focus:outline-hidden"
             >
-                Your profile
-            </a>
-            </MenuItem>
-            <MenuItem>
-            <a
-                href="#"
-                className="block px-4 py-2 text-sm text-gray-300 data-focus:bg-white/5 data-focus:outline-hidden"
-            >
-                Settings
-            </a>
-            </MenuItem>
-            <MenuItem>
-            <a
-                href="#"
-                className="block px-4 py-2 text-sm text-gray-300 data-focus:bg-white/5 data-focus:outline-hidden"
-            >
                 Sign out
             </a>
             </MenuItem>

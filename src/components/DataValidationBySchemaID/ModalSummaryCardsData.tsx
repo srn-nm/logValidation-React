@@ -1,50 +1,39 @@
-import type DataValidationResponse from "../types/dataValidationResponse"
+import type DataValidationResponse from "../../types/DataValidationResponseType"
 
-interface Props {
-  validationData: DataValidationResponse;
-  validationType: "schema" | "data" | null;
-}
+export default function ModalSummaryCardsData({ validationResponse }: {validationResponse: DataValidationResponse}) {
 
-export default function ModalSummaryCardsData({ validationData, validationType }: Props) {
-  const schemaIds = Object.keys(validationData);
-  const firstSchemaId = schemaIds[0] || "";
-  const schemaData = firstSchemaId ? validationData[firstSchemaId] : {};
-  
-  const dataEntries = Object.keys(schemaData);
-  const totalDataEntries = dataEntries.length;
-  
-  let totalIssues = 0;
+  let dataIDs: any[] = []
+  if (validationResponse.root) {
+      dataIDs = Object.keys(validationResponse.root);   
+  } 
+  const totalProblematicDatas = dataIDs.length;
+  const schemaId = validationResponse.id;
+  const description = validationResponse.description;
+
+  let totalIssues = 0; 
   let totalWarnings = 0;
   let totalErrors = 0;
-  
-  dataEntries.forEach(dataId => {
-    const dataEntry = schemaData[dataId];
-    if (dataEntry?.non_calc) {
-      totalIssues += dataEntry.non_calc.length;
-      
-      dataEntry.non_calc.forEach(issue => {
+  let totalDataEntries = 0; // value not set yet
+
+  dataIDs.forEach(dataID => {
+    console.log(validationResponse.root[dataID])
+    if (validationResponse.root[dataID].log.calc) {
+
+      totalIssues += validationResponse.root[dataID].log.calc.length;
+
+      validationResponse.root[dataID].log.calc.forEach(issue => {
         if (issue.level === "WARNING") totalWarnings++;
         if (issue.level === "ERROR") totalErrors++;
-      });
+      })
+    }
+    if (validationResponse.root[dataID].log.non_calc) {
+      totalIssues += validationResponse.root[dataID].log.non_calc.length;
+      validationResponse.root[dataID].log.non_calc.forEach(issue => {
+        if (issue.level === "WARNING") totalWarnings++;
+        if (issue.level === "ERROR") totalErrors++;
+      })
     }
   });
-  
-  const fieldCounts: Record<string, number> = {};
-  dataEntries.forEach(dataId => {
-    const dataEntry = schemaData[dataId];
-    if (dataEntry?.non_calc) {
-      dataEntry.non_calc.forEach(issue => {
-        fieldCounts[issue.field] = (fieldCounts[issue.field] || 0) + 1;
-      });
-    }
-  });
-  
-  const mostCommonField = Object.entries(fieldCounts).sort((a, b) => b[1] - a[1])[0];
-  const mostCommonFieldName = mostCommonField?.[0] || "N/A";
-  const mostCommonFieldCount = mostCommonField?.[1] || 0;
-  
-  const schemaId = (validationData as any).id || firstSchemaId || "N/A";
-  const description = (validationData as any).description || "Data Validation";
 
   return (
     <>
@@ -52,7 +41,6 @@ export default function ModalSummaryCardsData({ validationData, validationType }
         <div className="bg-gray-800 rounded-xl p-4">
           <h4 className="font-medium text-gray-400">Schema ID</h4>
           <p className="text-white text-lg font-mono">{schemaId}</p>
-          <p className="text-xs text-gray-500 mt-1">Analyzing {totalDataEntries} data entries</p>
         </div>
         
         <div className="bg-gray-800 rounded-xl p-4">
@@ -70,9 +58,6 @@ export default function ModalSummaryCardsData({ validationData, validationType }
               )}
             </div>
           </div>
-          <p className="text-xs text-gray-500 mt-1">
-            Across all data entries
-          </p>
         </div>
         
         <div className="bg-gray-800 rounded-xl p-4">
@@ -80,30 +65,18 @@ export default function ModalSummaryCardsData({ validationData, validationType }
           <p className="text-white text-lg">
             Data Check
           </p>
-          <p className="text-xs text-gray-500 mt-1">
-            {(validationData as any).type && `Type: ${(validationData as any).type}`}
+        </div>
+
+        <div className="bg-gray-800 rounded-xl p-4">
+          <h4 className="font-medium text-gray-400">Status</h4>
+          <p className={`text-lg font-semibold ${totalIssues > 0 ? 'text-yellow-400' : 'text-green-400'}`}>
+            {totalIssues > 0 ? "Issues Found" : "Valid"}
           </p>
         </div>
         
-        <div className="bg-gray-800 rounded-xl p-4">
-          <h4 className="font-medium text-gray-400">Common Issue</h4>
-          {mostCommonFieldCount > 0 ? (
-            <>
-              <p className="text-blue-300 text-lg font-mono truncate">{mostCommonFieldName}</p>
-              <p className="text-xs text-gray-500 mt-1">
-                Found in {mostCommonFieldCount} data entries
-              </p>
-            </>
-          ) : (
-            <>
-              <p className="text-green-400 text-lg">No Common Issues</p>
-              <p className="text-xs text-gray-500 mt-1">All checks passed</p>
-            </>
-          )}
-        </div>
       </div>
       
-      {totalIssues > 0 && (
+      {/* {totalIssues > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
           <div className="bg-gray-800/50 rounded-xl p-3">
             <div className="flex justify-between items-center">
@@ -130,7 +103,7 @@ export default function ModalSummaryCardsData({ validationData, validationType }
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </>
   );
 }

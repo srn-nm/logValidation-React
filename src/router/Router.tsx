@@ -5,6 +5,7 @@ import ErrorElement from "../components/ErrorElement";
 import LoginPage from "../pages/LoginPage"
 import Dashboard from "../pages/Dashboard";
 import SchemaValidation from "../pages/SchemaValidation"
+import DataDetail from "../pages/DataDetail";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,12 @@ const router = createBrowserRouter([
           {
             path: "SchemaValidation",
             element: <SchemaValidation />,
+            children: [
+              {
+                path: "data/detail/:id",
+                element: <DataDetail />
+              }
+            ]
           },
          
         ],

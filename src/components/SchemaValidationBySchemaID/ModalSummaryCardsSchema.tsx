@@ -1,11 +1,6 @@
-import type SchemaValidationResponse from "../types/schemaValidationResponse"
+import type SchemaValidationResponse from "../../types/SchemaValidationResponseType"
 
-interface Props {
-  validationData: SchemaValidationResponse ;
-  validationType: "schema" | "data" | null;
-}
-
-export default function ModalSummaryCards ({validationData, validationType}: Props) {
+export default function ModalSummaryCardsSchema ({validationData}: {validationData: SchemaValidationResponse }) {
     const issueCount = validationData.root?.length ?? 0;
     return (
         <>
@@ -25,8 +20,7 @@ export default function ModalSummaryCards ({validationData, validationType}: Pro
                     <div className="bg-gray-800 rounded-xl p-4">
                       <h4 className="font-medium text-gray-400">Validation Type</h4>
                       <p className="text-white text-lg">
-                        {validationType === "schema" ? "Schema Check" : "Data Check"}
-                        {validationData.type && ` (${validationData.type})`}
+                        Schema Check
                       </p>
                     </div>
                     
